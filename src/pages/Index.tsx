@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -8,6 +7,8 @@ import CTA from '@/components/CTA';
 import Footer from '@/components/Footer';
 
 const Index = () => {
+  const [activeButton, setActiveButton] = useState('customer'); // 'customer' or 'trucker'
+
   useEffect(() => {
     // Set up smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -51,51 +52,12 @@ const Index = () => {
     };
   }, []);
 
-  // Add any necessary JavaScript functions that were in the original HTML
-  useEffect(() => {
-    // Add event listeners for customer and trucker buttons
-    const customerBtns = document.querySelectorAll('#customerBtn, #mobilecustomerBtn');
-    const truckerBtns = document.querySelectorAll('#truckerBtn, #mobiletruckerBtn');
-    
-    const handleCustomerClick = () => {
-      const content = document.getElementById('content');
-      if (content && content.classList.contains('swapped')) {
-        content.classList.remove('swapped');
-      }
-    };
-    
-    const handleTruckerClick = () => {
-      const content = document.getElementById('content');
-      if (content && !content.classList.contains('swapped')) {
-        content.classList.add('swapped');
-      }
-    };
-    
-    customerBtns.forEach(btn => {
-      if (btn) btn.addEventListener('click', handleCustomerClick);
-    });
-    
-    truckerBtns.forEach(btn => {
-      if (btn) btn.addEventListener('click', handleTruckerClick);
-    });
-    
-    return () => {
-      customerBtns.forEach(btn => {
-        if (btn) btn.removeEventListener('click', handleCustomerClick);
-      });
-      
-      truckerBtns.forEach(btn => {
-        if (btn) btn.removeEventListener('click', handleTruckerClick);
-      });
-    };
-  }, []);
-
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Navbar activeButton={activeButton} setActiveButton={setActiveButton} />
       <main>
         <Hero />
-        <Features />
+        <Features activeButton={activeButton} />
         <HowItWorks />
         <CTA />
       </main>

@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ activeButton, setActiveButton }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [language, setLanguage] = useState('en'); // 'en' for English, 'ar' for Arabic
-  const [activeButton, setActiveButton] = useState('customer'); // Default active button
 
   useEffect(() => {
     const handleScroll = () => {

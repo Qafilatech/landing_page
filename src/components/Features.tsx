@@ -1,14 +1,13 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Features = () => {
+const Features = ({ activeButton }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [swapped, setSwapped] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const slideInterval = useRef<number | null>(null);
-  
-  const slides = [
+
+  const customerSlides = [
     {
       image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
       alt: "Logistics Management"
@@ -22,6 +21,35 @@ const Features = () => {
       alt: "Route Optimization"
     }
   ];
+
+  const truckerSlides = [
+    {
+      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      alt: "Fleet Management"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      alt: "Load Matching"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      alt: "Route Planning"
+    }
+  ];
+
+  const slides = activeButton === 'trucker' ? truckerSlides : customerSlides;
+
+  // Reset current slide when switching between customer and trucker
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [activeButton]);
+
+  // Reset animation when activeButton changes
+  useEffect(() => {
+    setIsAnimating(false);
+    // Brief timeout to trigger re-animation
+    setTimeout(() => setIsAnimating(true), 50);
+  }, [activeButton]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -49,7 +77,7 @@ const Features = () => {
         clearInterval(slideInterval.current);
       }
     };
-  }, []);
+  }, [activeButton]); // Restart slideshow when activeButton changes
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -71,70 +99,28 @@ const Features = () => {
     };
   }, []);
 
-  const handleCustomerClick = () => {
-    setSwapped(false);
-  };
-
-  const handleTruckerClick = () => {
-    setSwapped(true);
-  };
-
-  // Add event listeners for the buttons from the navbar
-  useEffect(() => {
-    const customerBtn = document.getElementById('customerBtn');
-    const truckerBtn = document.getElementById('truckerBtn');
-    const mobileCustomerBtn = document.getElementById('mobilecustomerBtn');
-    const mobileTruckerBtn = document.getElementById('mobiletruckerBtn');
-    
-    if (customerBtn) customerBtn.addEventListener('click', handleCustomerClick);
-    if (truckerBtn) truckerBtn.addEventListener('click', handleTruckerClick);
-    if (mobileCustomerBtn) mobileCustomerBtn.addEventListener('click', handleCustomerClick);
-    if (mobileTruckerBtn) mobileTruckerBtn.addEventListener('click', handleTruckerClick);
-    
-    return () => {
-      if (customerBtn) customerBtn.removeEventListener('click', handleCustomerClick);
-      if (truckerBtn) truckerBtn.removeEventListener('click', handleTruckerClick);
-      if (mobileCustomerBtn) mobileCustomerBtn.removeEventListener('click', handleCustomerClick);
-      if (mobileTruckerBtn) mobileTruckerBtn.removeEventListener('click', handleTruckerClick);
-    };
-  }, []);
-
   return (
     <section id="features" className="section-padding bg-gradient-to-b from-white to-gray-50" ref={sectionRef}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${swapped ? 'lg:flex-row-reverse' : ''}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${activeButton === 'trucker' ? 'lg:flex-row-reverse' : ''}`}>
           {/* Text Content */}
-          <div className={`animate-on-scroll ${swapped ? 'lg:order-2' : 'lg:order-1'}`}>
-            <h2 className="section-title">Optimize Your Logistics Operations</h2>
+          <div className={`transition-all duration-500 ease-in-out ${
+            isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          } ${activeButton === 'trucker' ? 'lg:order-2' : 'lg:order-1'}`}>
+            <h2 className="section-title">
+              {activeButton === 'trucker' ? 'Optimize Your Trucking Operations' : 'Optimize Your Logistics Operations'}
+            </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Efficiently manage deliveries and logistics with our comprehensive marketplace. 
-              Join today to streamline your operations and enhance your business growth.
+              {activeButton === 'trucker'
+                ? 'Maximize your trucking efficiency with our advanced tools. Join today to streamline your routes and grow your business.'
+                : 'Efficiently manage deliveries and logistics with our comprehensive marketplace. Join today to streamline your operations and enhance your business growth.'}
             </p>
-            <div className="flex flex-wrap gap-3 mb-8">
-              <button 
-                onClick={handleCustomerClick}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  !swapped ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                For Customers
-              </button>
-              <button 
-                onClick={handleTruckerClick}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  swapped ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                For Truckers
-              </button>
-            </div>
-            <a href="#cta" className="btn-main">
-              Get Started Now
-            </a>
           </div>
           
           {/* Carousel */}
-          <div className={`animate-on-scroll ${swapped ? 'lg:order-1' : 'lg:order-2'}`}>
+          <div className={`transition-all duration-200 ease-in-out ${
+            isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          } ${activeButton === 'trucker' ? 'lg:order-1' : 'lg:order-2'}`}>
             <div className="relative rounded-2xl overflow-hidden shadow-xl">
               {/* Slide indicators */}
               <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center space-x-2">
@@ -184,7 +170,7 @@ const Features = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-8 left-8 right-8 text-white">
                       <span className="text-sm uppercase tracking-wider opacity-75">
-                        {swapped ? 'For Truckers' : 'For Customers'}
+                        {activeButton === 'trucker' ? 'For Truckers' : 'For Customers'}
                       </span>
                       <h3 className="text-xl font-bold mt-1">{slide.alt}</h3>
                     </div>
