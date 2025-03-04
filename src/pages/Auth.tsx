@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, Shield} from 'lucide-react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
+import { setAdminStatus } from '@/utils/adminUtils';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -10,14 +11,17 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { language, setLanguage, texts} = useLanguage();
+  const navigate = useNavigate();
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+    setAdminStatus(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -40,6 +44,8 @@ const Auth = () => {
       return;
     }
 
+    setAdminStatus(isAdmin);
+
     // Here you would typically connect to an authentication service
     toast({
       title: isSignUp 
@@ -52,6 +58,13 @@ const Auth = () => {
 
     // For demo purposes only - would normally redirect after auth
     console.log("Form submitted with:", { email, password });
+
+
+    if(isAdmin){
+        navigate('/admin');
+    } else{
+        navigate('/');
+    }
   };
 
   const authTexts = {
@@ -69,7 +82,10 @@ const Auth = () => {
       switchToSignIn: 'Sign in',
       changeLanguage: 'AR',
       joinPlatform: 'Join Our Platform',
-      platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.'
+      platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.',
+      adminAccess: 'Admin Access',
+      adminCheckbox: 'Sign in as administrator',
+      adminNote: 'This is for demo purposes only'
     },
     ar: {
       createAccount: 'إنشاء حساب',
@@ -85,7 +101,10 @@ const Auth = () => {
       switchToSignIn: 'تسجيل الدخول',
       changeLanguage: 'EN',
       joinPlatform: 'انضم إلى منصتنا',
-      platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.'
+      platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.',
+      adminAccess: 'وصول المسؤول',
+      adminCheckbox: 'تسجيل الدخول كمسؤول',
+      adminNote: 'هذا لأغراض العرض التوضيحي فقط'
     }};
 
   return (
@@ -170,6 +189,8 @@ const Auth = () => {
               </div>
             </div>
 
+
+
             {isSignUp && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
@@ -193,6 +214,23 @@ const Auth = () => {
                 </div>
               </div>
             )}
+            <div className="flex items-center gap-2">
+              <input
+                id="adminAccess"
+                type="checkbox"
+                checked={isAdmin}
+                onChange={() => setIsAdmin(!isAdmin)}
+                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              />
+              <div className="flex flex-col">
+                <label htmlFor="adminAccess" className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <Shield className="h-4 w-4 text-amber-500" />
+                  {authTexts[language].adminCheckbox}
+                </label>
+                <p className="text-xs text-gray-500">{authTexts[language].adminNote}</p>
+              </div>
+            </div>
+            
 
             <div>
               <button

@@ -28,6 +28,10 @@ const commonTexts = {
     contactSales: 'Contact Sales',
     backToHome: 'Back to home',
     contactUs: 'Contact Us',
+    admin: 'Admin',
+    adminDashboard: 'Admin Dashboard',
+    accessDenied: 'Access Denied',
+    noPermission: 'You don\'t have permission to view this page',
   },
   ar: {
     home: 'الرئيسية',
@@ -42,6 +46,11 @@ const commonTexts = {
     contactSales: 'تواصل مع المبيعات',
     backToHome: 'العودة إلى الصفحة الرئيسية',
     contactUs: 'تواصل معنا',
+    admin: 'المشرف',
+    adminDashboard: 'لوحة تحكم المشرف',
+    accessDenied: 'تم رفض الوصول',
+    noPermission: 'ليس لديك إذن لعرض هذه الصفحة',
+
   },
 };
 
