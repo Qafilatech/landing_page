@@ -1,4 +1,3 @@
-
 ## Features
 
 - Responsive design that works on all devices
@@ -13,8 +12,9 @@ To start development:
 
 1. Make sure you have Node.js installed (v16 or higher recommended)
 2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
-4. Build for production: `npm run build`
+3. Navigate to the project directory: `cd landing_page/src`
+4. Start development server: `npm run dev`
+5. Build for production: `npm run build`
 
 ## Contributing
 
@@ -24,6 +24,4 @@ To start development:
 4. Push to the branch: `git push origin feature/my-new-feature`
 5. Submit a pull request
 
-## License
-
-[Add your license information here]
+Made with 🤘🏿 by Halumi
