@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const {language} = useLanguage();
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -26,6 +28,25 @@ const Hero = () => {
       }
     };
   }, []);
+
+  const heroTexts = {
+    en: {
+      tagline: 'Streamline Your Logistics with Ease',
+      title: 'Connecting Customers, Truck Drivers, ',
+      titleHighlight: 'and Businesses.',
+      description: 'Efficiently manage deliveries and logistics with our comprehensive marketplace. Join today to streamline your operations and enhance your business growth.',
+      downloadButton: 'Download Now',
+      learnMoreButton: 'Learn More'
+    },
+    ar: {
+      tagline: 'بسّط عمليات الخدمات اللوجستية بسهولة',
+      title: 'ربط العملاء وسائقي الشاحنات ',
+      titleHighlight: 'والشركات.',
+      description: 'إدارة عمليات التسليم والخدمات اللوجستية بكفاءة مع منصتنا الشاملة. انضم اليوم لتبسيط عملياتك وتعزيز نمو أعمالك.',
+      downloadButton: 'تحميل الآن',
+      learnMoreButton: 'اعرف المزيد'
+    }
+  };
 
   return (
     <section 
@@ -64,25 +85,24 @@ const Hero = () => {
             <div className="max-w-2xl">
               <div className="inline-block mb-4">
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                  Streamline Your Logistics with Ease
+                  {heroTexts[language].tagline}
                 </span>
               </div>
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                Connecting Customers, Truck Drivers, <span className="text-primary">and Businesses.</span>
+                {heroTexts[language].title} <span className="text-primary">{heroTexts[language].titleHighlight}</span>
               </h1>
               
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                Efficiently manage deliveries and logistics with our comprehensive marketplace. 
-                Join today to streamline your operations and enhance your business growth.
+                {heroTexts[language].description}
               </p>
               
               <div className="flex flex-wrap gap-4">
                 <a href="#features" className="btn-main">
-                  Download Now
+                  {heroTexts[language].downloadButton}
                 </a>
                 <a href="#howitworks" className="px-8 py-3 border border-primary/20 text-primary rounded-full font-medium hover:bg-primary/5 transition-colors">
-                  Learn More
+                  {heroTexts[language].learnMoreButton}
                 </a>
               </div>
             </div>

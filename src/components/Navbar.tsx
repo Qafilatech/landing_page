@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, LogIn, Languages} from 'lucide-react';
+import {Link} from 'react-router-dom';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Navbar = ({ activeButton, setActiveButton }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [language, setLanguage] = useState('en'); // 'en' for English, 'ar' for Arabic
+  const {language, setLanguage, texts} = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,10 +31,10 @@ const Navbar = ({ activeButton, setActiveButton }) => {
   };
 
   const navLinks = [
-    { name: language === 'en' ? 'Home' : 'الرئيسية', href: '#hero' },
-    { name: language === 'en' ? 'Features' : 'المميزات', href: '#features' },
-    { name: language === 'en' ? 'Testimonials' : 'الشهادات', href: '#testimonials' },
-    { name: language === 'en' ? 'Pricing' : 'الأسعار', href: '#pricing' },
+    { name: texts[language].home, href: '#hero' },
+    { name: texts[language].features, href: '#features' },
+    { name: texts[language].testimonials, href: '#testimonials' },
+    { name: texts[language].pricing, href: '#pricing' },
   ];
 
   return (
@@ -78,7 +80,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
               id="customerBtn"
               onClick={() => handleButtonClick('customer')}
             >
-              {language === 'en' ? 'Customer' : 'العميل'}
+              {texts[language].customer}
             </a>
             <a 
               href="#features" 
@@ -90,10 +92,21 @@ const Navbar = ({ activeButton, setActiveButton }) => {
               id="truckerBtn"
               onClick={() => handleButtonClick('trucker')}
             >
-              {language === 'en' ? 'Trucker' : 'سائق الشاحنة'}
+              {texts[language].trucker}
             </a>
+
+            {/*Sign Up Toggle */}
+
+            <Link
+              to="/auth"
+            className="flex items-center justify-center px-4 py-2 rounded-full bg-white/90 shadow-sm border border-gray-200 text-primary font-medium hover:bg-white transition-colors">
             
+            <LogIn className='h-4 w-4 mr-2'/>
+            <span>{texts[language].signUpLogin}</span>
+            </Link>
+
             {/* Language Toggle */}
+
             <button 
               onClick={toggleLanguage}
               className="p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary"
@@ -149,7 +162,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
                     handleButtonClick('customer');
                   }}
                 >
-                  {language === 'en' ? 'Customer' : 'العميل'}
+                  {texts[language].customer}
                 </a>
                 <a 
                   href="#features" 
@@ -164,7 +177,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
                     handleButtonClick('trucker');
                   }}
                 >
-                  {language === 'en' ? 'Trucker' : 'سائق الشاحنة'}
+                  {texts[language].trucker}
                 </a>
                 
                 {/* Mobile Language Toggle */}

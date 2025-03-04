@@ -1,8 +1,11 @@
 
 import { useEffect } from 'react';
 import { Package, Search, Check } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const HowItWorks = () => {
+  const {language, setLanguage, texts} = useLanguage();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -22,6 +25,15 @@ const HowItWorks = () => {
       elements.forEach(el => observer.unobserve(el));
     };
   }, []);
+
+  const HowitWordsText = {
+    en: {
+
+    },
+    ar: {
+
+    }
+  }
 
   const steps = [
     {
