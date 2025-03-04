@@ -11,7 +11,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { toast } = useToast();
-  const { language, setLanguage, texts } = useLanguage();
+  const { language, setLanguage, texts} = useLanguage();
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
@@ -67,7 +67,7 @@ const Auth = () => {
       dontHaveAccount: 'Don\'t have an account?',
       createOne: 'Create one',
       switchToSignIn: 'Sign in',
-      changeLanguage: 'العربية',
+      changeLanguage: 'AR',
       joinPlatform: 'Join Our Platform',
       platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.'
     },
@@ -83,7 +83,7 @@ const Auth = () => {
       dontHaveAccount: 'ليس لديك حساب؟',
       createOne: 'إنشاء حساب',
       switchToSignIn: 'تسجيل الدخول',
-      changeLanguage: 'English',
+      changeLanguage: 'EN',
       joinPlatform: 'انضم إلى منصتنا',
       platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.'
     }};
@@ -100,14 +100,14 @@ const Auth = () => {
         
         <button 
           onClick={toggleLanguage}
-          className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary`}
+          className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-white/80 text-primary`}
         >
-          {texts[language].changeLanguage}
+          {authTexts[language].changeLanguage}
         </button>
 
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            {isSignUp ? texts[language].createAccount : texts[language].signIn}
+            {isSignUp ? authTexts[language].createAccount : authTexts[language].signIn}
           </h2>
         </div>
 
@@ -115,7 +115,7 @@ const Auth = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                {texts[language].emailAddress}
+                {authTexts[language].emailAddress}
               </label>
               <div className="mt-2 relative">
               <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
@@ -138,7 +138,7 @@ const Auth = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                {texts[language].password}
+                {authTexts[language].password}
               </label>
               <div className="mt-2 relative">
               <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
@@ -173,7 +173,7 @@ const Auth = () => {
             {isSignUp && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
-                  {texts[language].confirmPassword}
+                  {authTexts[language].confirmPassword}
                 </label>
                 <div className="mt-2 relative">
                 <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
@@ -197,20 +197,19 @@ const Auth = () => {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                {isSignUp ? texts[language].signUpButton : texts[language].signInButton}
+                className="flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                {isSignUp ? authTexts[language].signUpButton : authTexts[language].signInButton}
               </button>
             </div>
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-          {isSignUp ? texts[language].alreadyHaveAccount : texts[language].dontHaveAccount}
+          {isSignUp ? authTexts[language].alreadyHaveAccount : authTexts[language].dontHaveAccount}
           <button
               onClick={toggleForm}
               className="font-semibold leading-6 text-primary hover:text-primary/80 mr-1 ml-1"
             >
-              {isSignUp ? texts[language].switchToSignIn : texts[language].createOne}
+              {isSignUp ? authTexts[language].switchToSignIn : authTexts[language].createOne}
               </button>
           </p>
         </div>

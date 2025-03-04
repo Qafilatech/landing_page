@@ -25,15 +25,59 @@ const HowItWorks = () => {
       elements.forEach(el => observer.unobserve(el));
     };
   }, []);
-
   const HowitWordsText = {
     en: {
-
+      title: 'How it Works',
+      description: 'Our platform is designed to make your logistics operations seamless and efficient. Here\'s how it works:',
+      steps: [
+        {
+          icon: <Package className="w-6 h-6" />,
+          title: 'Sign Up',
+          description: 'Sign up for an account on our platform to get started.'
+        },
+        {
+          icon: <Search className="w-6 h-6" />,
+          title: 'Search',
+          description: 'Search for available truck drivers and customers on our platform.'
+        },
+        {
+          icon: <Check className="w-6 h-6" />,
+          title: 'Book',
+          description: 'Book a truck driver or customer for your logistics needs.'
+        }
+      ]
     },
     ar: {
-
+      title: 'كيف يعمل',
+      description: 'تم تصميم منصتنا لجعل عملياتك اللوجستية سلسة وفعالة. إليك كيف يعمل:',
+      steps: [
+        {
+          icon: <Package className="w-6 h-6" />,
+          title: 'سجل',
+          description: 'سجل للحصول على حساب على منصتنا للبدء.'
+        },
+        {
+          icon: <Search className="w-6 h-6" />,
+          title: 'ابحث',
+          description: 'ابحث عن سائقي الشاحنات والعملاء المتاحين على منصتنا.'
+        },
+        {
+          icon: <Check className="w-6 h-6" />,
+          title: 'احجز',
+          description: 'احجز سائق شاحنة أو عميل لاحتياجاتك اللوجستية.'
+        }
+      ]
     }
-  }
+  };
+
+  // const HowitWordsText = {
+  //   en: {
+
+  //   },
+  //   ar: {
+
+  //   }
+  // }
 
   const steps = [
     {

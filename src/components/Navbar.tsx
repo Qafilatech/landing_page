@@ -33,8 +33,8 @@ const Navbar = ({ activeButton, setActiveButton }) => {
   const navLinks = [
     { name: texts[language].home, href: '#hero' },
     { name: texts[language].features, href: '#features' },
-    { name: texts[language].testimonials, href: '#testimonials' },
-    { name: texts[language].pricing, href: '#pricing' },
+    // { name: texts[language].testimonials, href: '#testimonials' },
+    // { name: texts[language].pricing, href: '#pricing' },
   ];
 
   return (
@@ -97,13 +97,13 @@ const Navbar = ({ activeButton, setActiveButton }) => {
 
             {/*Sign Up Toggle */}
 
-            <Link
+            {/* <Link
               to="/auth"
             className="flex items-center justify-center px-4 py-2 rounded-full bg-white/90 shadow-sm border border-gray-200 text-primary font-medium hover:bg-white transition-colors">
             
             <LogIn className='h-4 w-4 mr-2'/>
             <span>{texts[language].signUpLogin}</span>
-            </Link>
+            </Link> */}
 
             {/* Language Toggle */}
 
