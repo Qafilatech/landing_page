@@ -37,4 +37,46 @@ To start development:
 4. Push to the branch: `git push origin feature/my-new-feature`
 5. Submit a pull request
 
+## File Structure
+landing_page/
+├── public/ # Public static files
+│ ├── favicon.ico
+│ └── robots.txt
+├── src/
+│ ├── assets/ # Images, fonts, and other static assets
+│ │ ├── images/
+│ │ └── fonts/
+│ ├── components/ # Reusable UI components
+│ │ ├── Button/
+│ │ ├── Card/
+│ │ ├── Input/
+│ │ └── Navigation/
+│ ├── layouts/ # Layout components
+│ │ ├── MainLayout.tsx
+│ │ └── AuthLayout.tsx
+│ ├── pages/ # Page components
+│ │ ├── Home/
+│ │ ├── About/
+│ │ ├── Contact/
+│ │ └── NotFound/
+│ ├── services/ # API and external service integrations
+│ │ └── api.ts
+│ ├── styles/ # Global styles and theme configuration
+│ │ ├── globals.css
+│ │ └── theme.ts
+│ ├── utils/ # Helper functions and constants
+│ │ ├── constants.ts
+│ │ └── helpers.ts
+│ ├── App.tsx # Root component
+│ ├── main.tsx # Application entry point
+│ └── vite-env.d.ts # Vite type declarations
+├── .eslintrc.json # ESLint configuration
+├── .gitignore # Git ignore rules
+├── index.html # HTML entry point
+├── package.json # Project dependencies and scripts
+├── tsconfig.json # TypeScript configuration
+├── vite.config.ts # Vite configuration
+└── tailwind.config.js # Tailwind CSS configuration
+
+
 Made with 🤘🏿 by Halumi
