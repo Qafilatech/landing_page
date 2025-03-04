@@ -27,6 +27,7 @@ const commonTexts = {
     learnMore: 'Learn More',
     contactSales: 'Contact Sales',
     backToHome: 'Back to home',
+    contactUs: 'Contact Us',
   },
   ar: {
     home: 'الرئيسية',
@@ -40,6 +41,7 @@ const commonTexts = {
     learnMore: 'اعرف المزيد',
     contactSales: 'تواصل مع المبيعات',
     backToHome: 'العودة إلى الصفحة الرئيسية',
+    contactUs: 'تواصل معنا',
   },
 };
 

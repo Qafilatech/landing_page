@@ -33,7 +33,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
   const navLinks = [
     { name: texts[language].home, href: '#hero' },
     { name: texts[language].features, href: '#features' },
-    // { name: texts[language].testimonials, href: '#testimonials' },
+     { name: texts[language].contactUs, href: '#contactus' },
     // { name: texts[language].pricing, href: '#pricing' },
   ];
 
