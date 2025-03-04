@@ -6,6 +6,19 @@
 - Modern UI components from shadcn/ui
 - Optimized performance with Vite
 
+## Tech Stack
+
+- **Frontend Framework:** React 18 with TypeScript
+- **Build Tool:** Vite
+- **Styling:** 
+  - Tailwind CSS for utility-first styling
+  - shadcn/ui for reusable components
+- **Icons:** Lucide React
+- **Routing:** React Router DOM
+- **Form Handling:** React Hook Form
+- **State Management:** React Context
+- **Animations:** Tailwind CSS animations
+
 ## Development
 
 To start development:
