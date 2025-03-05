@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -109,6 +108,18 @@ export default {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-10px)' },
 				},
+				'draw-path': {
+					'0%': { 'stroke-dashoffset': '1000' },
+					'100%': { 'stroke-dashoffset': '0' }
+				},
+				'bounce-slow': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'spin-slow': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -120,6 +131,9 @@ export default {
 				'image-zoom': 'image-zoom 0.7s ease-out forwards',
 				'pulse-soft': 'pulse-soft 3s infinite ease-in-out',
 				'float': 'float 6s ease-in-out infinite',
+				'draw': 'draw-path 2s ease-out forwards',
+				'bounce-slow': 'bounce-slow 3s infinite ease-in-out',
+				'spin-slow': 'spin-slow 8s linear infinite',
 			},
 			transitionDuration: {
 				'2000': '2000ms',

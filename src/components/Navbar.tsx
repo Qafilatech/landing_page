@@ -33,8 +33,9 @@ const Navbar = ({ activeButton, setActiveButton }) => {
   const navLinks = [
     { name: texts[language].home, href: '#hero' },
     { name: texts[language].features, href: '#features' },
-     { name: texts[language].contactUs, href: '#contactus' },
+    //{ name: texts[language].contactUs, href: '#contactus' },
     // { name: texts[language].pricing, href: '#pricing' },
+    { name: texts[language].howitworks, href: '#howitworks' },
   ];
 
   return (
@@ -48,20 +49,25 @@ const Navbar = ({ activeButton, setActiveButton }) => {
           <div className="flex items-center">
             <a href="#" className="flex items-center">
               <img 
-                src="https://placehold.co/200x60?text=QafilaTech" 
+                src={scrolled ? '/webLogoDark.png' : '/webLogoLight.png'} 
                 alt="QafilaTech Logo"
-                className="h-8 md:h-10 w-auto"
+                className="h-4 md:h-6 w-auto"
               />
             </a>
           </div>
 
           {/* Desktop Navigation */}
+          
           <div className="hidden md:flex md:items-center md:space-x-8">
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
                 href={link.href} 
-                className="nav-link text-sm font-medium hover:text-primary"
+                className={`nav-link text-sm font-medium ${
+                  scrolled 
+                    ? 'text-foreground/80 hover:text-primary' 
+                    : 'text-white hover:text-white/80'
+                }`}  
               >
                 {link.name}
               </a>
@@ -109,11 +115,11 @@ const Navbar = ({ activeButton, setActiveButton }) => {
 
             <button 
               onClick={toggleLanguage}
-              className="p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary"
+              className="p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary flex flex-row-reverse items-center"
               aria-label="Toggle Language"
             >
               <Globe className="h-4 w-4" />
-              <span className="ml-1 text-xs">{language === 'en' ? 'AR' : 'EN'}</span>
+              <span className="mr-1 ml-1 text-xs">{language === 'en' ? 'AR' : 'EN'}</span>
             </button>
           </div>
 
