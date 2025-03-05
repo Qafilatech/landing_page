@@ -49,7 +49,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
           <div className="flex items-center">
             <a href="#" className="flex items-center">
               <img 
-                src={scrolled ? '/webLogoDark.png' : '/webLogoLight.png'} 
+                src={scrolled ? '/QT-Logo/Dark/LogoDark.png' : '/QT-Logo/Light/LogoLight.png'} 
                 alt="QafilaTech Logo"
                 className="h-4 md:h-6 w-auto"
               />

@@ -10,94 +10,197 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Circle, Triangle, Square, Hexagon, Star, Pentagon } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Features = ({ activeButton }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const slideInterval = useRef<number | null>(null);
+  const { language } = useLanguage();
 
-  // Slide data for different user types
-  const customerSlides = [
-    {
-      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Logistics Management",
-      title: "Smart Logistics Management",
-      description: "Streamline your supply chain with our intelligent logistics management system. Track shipments in real-time and optimize delivery routes.",
-      highlights: [
-        "Real-time shipment tracking",
-        "Automated route planning",
-        "Delivery status updates",
-        "Performance analytics"
-      ]
+  // Translation data
+  const featuresText = {
+    en: {
+      customerTitle: '| Features - For Customers',
+      truckerTitle: '| Features - For Truckers',
+      joinWaitlist: 'Join Waitlist',
+      learnMore: 'Learn More',
+      forCustomers: 'For Customers',
+      forTruckers: 'For Truckers'
     },
-    {
-      image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Delivery Tracking",
-      title: "Real-Time Delivery Tracking",
-      description: "Keep your customers informed with precise delivery tracking. Get instant updates and estimated arrival times for all your shipments.",
-      highlights: [
-        "Live GPS tracking",
-        "Instant notifications",
-        "Accurate ETAs",
-        "Customer updates"
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Route Optimization",
-      title: "Advanced Route Optimization",
-      description: "Reduce delivery times and costs with our AI-powered route optimization. Make your logistics operations more efficient and sustainable.",
-      highlights: [
-        "AI-powered routing",
-        "Cost optimization",
-        "Fuel efficiency",
-        "Time-saving paths"
-      ]
+    ar: {
+      customerTitle: '| المميزات - للعملاء',
+      truckerTitle: '| المميزات - للسائقين',
+      joinWaitlist: 'انضم لقائمة الانتظار',
+      learnMore: 'اعرف المزيد',
+      forCustomers: 'للعملاء',
+      forTruckers: 'للسائقين'
     }
-  ];
+  };
 
-  const truckerSlides = [
-    {
-      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Fleet Management",
-      title: "Efficient Fleet Management",
-      description: "Manage your fleet with ease using our comprehensive dashboard. Monitor vehicle performance, maintenance schedules, and driver activities.",
-      highlights: [
-        "Vehicle monitoring",
-        "Maintenance alerts",
-        "Driver management",
-        "Performance tracking"
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Load Matching",
-      title: "Smart Load Matching",
-      description: "Find the perfect loads for your routes with our intelligent matching system. Maximize your earnings by reducing empty miles.",
-      highlights: [
-        "Smart load suggestions",
-        "Route optimization",
-        "Earnings calculator",
-        "Real-time availability"
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Route Planning",
-      title: "Dynamic Route Planning",
-      description: "Plan your routes efficiently with real-time traffic data and weather updates. Save time and fuel while delivering on schedule.",
-      highlights: [
-        "Traffic integration",
-        "Weather updates",
-        "Optimal routing",
-        "Schedule planning"
-      ]
-    }
-  ];
+  // Customer slides with translations
+  const customerSlides = {
+    en: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Logistics Management",
+        title: "Smart Logistics Management",
+        description: "Streamline your supply chain with our intelligent logistics management system. Track shipments in real-time and optimize delivery routes.",
+        highlights: [
+          "Real-time shipment tracking",
+          "Automated route planning",
+          "Delivery status updates",
+          "Performance analytics"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Delivery Tracking",
+        title: "Real-Time Delivery Tracking",
+        description: "Keep your customers informed with precise delivery tracking. Get instant updates and estimated arrival times for all your shipments.",
+        highlights: [
+          "Live GPS tracking",
+          "Instant notifications",
+          "Accurate ETAs",
+          "Customer updates"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Route Optimization",
+        title: "Advanced Route Optimization",
+        description: "Reduce delivery times and costs with our AI-powered route optimization. Make your logistics operations more efficient and sustainable.",
+        highlights: [
+          "AI-powered routing",
+          "Cost optimization",
+          "Fuel efficiency",
+          "Time-saving paths"
+        ]
+      }
+    ],
+    ar: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "إدارة الخدمات اللوجستية",
+        title: "إدارة ذكية للخدمات اللوجستية",
+        description: "قم بتبسيط سلسلة التوريد الخاصة بك مع نظام إدارة الخدمات اللوجستية الذكي. تتبع الشحنات في الوقت الفعلي وتحسين مسارات التسليم.",
+        highlights: [
+          "تتبع الشحنات في الوقت الفعلي",
+          "تخطيط المسار التلقائي",
+          "تحديثات حالة التسليم",
+          "تحليلات الأداء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تتبع التسليم",
+        title: "تتبع التسليم في الوقت الفعلي",
+        description: "أبق عملائك على اطلاع بتتبع التسليم الدقيق. احصل على تحديثات فورية وأوقات وصول متوقعة لجميع شحناتك.",
+        highlights: [
+          "تتبع GPS المباشر",
+          "إشعارات فورية",
+          "أوقات وصول دقيقة",
+          "تحديثات العملاء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تحسين المسار",
+        title: "تحسين متقدم للمسار",
+        description: "قلل من أوقات التسليم والتكاليف مع تحسين المسار المدعوم بالذكاء الاصطناعي. اجعل عملياتك اللوجستية أكثر كفاءة واستدامة.",
+        highlights: [
+          "توجيه مدعوم بالذكاء الاصطناعي",
+          "تحسين التكلفة",
+          "كفاءة الوقود",
+          "مسارات موفرة للوقت"
+        ]
+      }
+    ]
+  };
 
-  // Select appropriate slides based on active user type
-  const slides = activeButton === 'trucker' ? truckerSlides : customerSlides;
+  // Trucker slides with translations
+  const truckerSlides = {
+    en: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Fleet Management",
+        title: "Efficient Fleet Management",
+        description: "Manage your fleet with ease using our comprehensive dashboard. Monitor vehicle performance, maintenance schedules, and driver activities.",
+        highlights: [
+          "Vehicle monitoring",
+          "Maintenance alerts",
+          "Driver management",
+          "Performance tracking"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Load Matching",
+        title: "Smart Load Matching",
+        description: "Find the perfect loads for your routes with our intelligent matching system. Maximize your earnings by reducing empty miles.",
+        highlights: [
+          "Smart load suggestions",
+          "Route optimization",
+          "Earnings calculator",
+          "Real-time availability"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Route Planning",
+        title: "Dynamic Route Planning",
+        description: "Plan your routes efficiently with real-time traffic data and weather updates. Save time and fuel while delivering on schedule.",
+        highlights: [
+          "Traffic integration",
+          "Weather updates",
+          "Optimal routing",
+          "Schedule planning"
+        ]
+      }
+    ],
+    ar: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "إدارة الأسطول",
+        title: "إدارة فعالة للأسطول",
+        description: "أدر أسطولك بسهولة باستخدام لوحة التحكم الشاملة لدينا. راقب أداء المركبات وجداول الصيانة وأنشطة السائقين.",
+        highlights: [
+          "مراقبة المركبات",
+          "تنبيهات الصيانة",
+          "إدارة السائقين",
+          "تتبع الأداء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "مطابقة الحمولة",
+        title: "مطابقة ذكية للحمولة",
+        description: "اعثر على الحمولات المثالية لمساراتك مع نظام المطابقة الذكي لدينا. زد من أرباحك عن طريق تقليل الأميال الفارغة.",
+        highlights: [
+          "اقتراحات حمولة ذكية",
+          "تحسين المسار",
+          "حاسبة الأرباح",
+          "التوفر في الوقت الفعلي"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تخطيط المسار",
+        title: "تخطيط ديناميكي للمسار",
+        description: "خطط لمساراتك بكفاءة مع بيانات حركة المرور في الوقت الفعلي وتحديثات الطقس. وفر الوقت والوقود أثناء التسليم في الموعد المحدد.",
+        highlights: [
+          "تكامل حركة المرور",
+          "تحديثات الطقس",
+          "التوجيه الأمثل",
+          "تخطيط الجدول الزمني"
+        ]
+      }
+    ]
+  };
+
+  // Select appropriate slides based on active user type and language
+  const slides = activeButton === 'trucker' ? truckerSlides[language] : customerSlides[language];
 
   // Reset current slide when switching between customer and trucker views
   useEffect(() => {
@@ -219,7 +322,7 @@ const Features = ({ activeButton }) => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${activeButton === 'trucker' ? 'lg:flex-row-reverse' : ''}`}>
           {/* Text Content */}
           <div className={`transition-all duration-500 ease-in-out ${
@@ -237,7 +340,7 @@ const Features = ({ activeButton }) => {
                 >
                   <div className="inline-block mb-4">
                     <span className="px-3 py-1 rounded-full text-s font-medium bg-primary/30 text-primary">
-                      | Features
+                      {activeButton === 'trucker' ? featuresText[language].truckerTitle : featuresText[language].customerTitle}
                     </span>
                   </div>
                   
@@ -258,13 +361,13 @@ const Features = ({ activeButton }) => {
                     ))}
                   </div>
 
-                  {/* Coming Soon CTA */}
-                  <div className="flex items-center space-x-4">
+                  {/* CTA Buttons */}
+                  <div className="flex flex-wrap gap-4">
                     <button className="btn-main">
-                      Join Waitlist
+                      {featuresText[language].joinWaitlist}
                     </button>
                     <button className="flex items-center text-primary hover:text-primary/80 transition-colors">
-                      <span>Learn More</span>
+                      <span>{featuresText[language].learnMore}</span>
                       <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                       </svg>
@@ -279,7 +382,7 @@ const Features = ({ activeButton }) => {
           <div className={`transition-all duration-200 ease-in-out ${
             isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           } ${activeButton === 'trucker' ? 'lg:order-1' : 'lg:order-2'}`}>
-            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
               {/* Slide indicators */}
               <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center space-x-2">
                 {slides.map((_, index) => (
@@ -312,7 +415,7 @@ const Features = ({ activeButton }) => {
               </button>
               
               {/* Slides */}
-              <div className="relative aspect-[16/9] bg-gray-900">
+              <div className="relative w-full h-full">
                 {slides.map((slide, index) => (
                   <div
                     key={index}
@@ -328,7 +431,7 @@ const Features = ({ activeButton }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-8 left-8 right-8 text-white">
                       <span className="text-sm uppercase tracking-wider opacity-75">
-                        {activeButton === 'trucker' ? 'For Truckers' : 'For Customers'}
+                        {activeButton === 'trucker' ? featuresText[language].forTruckers : featuresText[language].forCustomers}
                       </span>
                       <h3 className="text-xl font-bold mt-1">{slide.alt}</h3>
                     </div>

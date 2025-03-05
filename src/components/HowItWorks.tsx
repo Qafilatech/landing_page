@@ -116,7 +116,7 @@ const HowItWorks = () => {
   };
 
   return (
-    <section id="howitworks" className="section-padding bg-gradient-to-b from-white to-blue-50 relative overflow-hidden">
+    <section id="howitworks" className="section-padding bg-gradient-to-b from-white to-green-50 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
