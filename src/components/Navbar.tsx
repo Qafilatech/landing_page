@@ -159,8 +159,8 @@ const Navbar = ({ activeButton, setActiveButton }) => {
                   href="#features" 
                   className={`nav-btn btn-demo-small ${
                     activeButton === 'customer' 
-                      ? 'bg-blue-800 text-white border-blue-800' 
-                      : 'bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30'
+                      ? 'bg-primary' 
+                      : 'bg-primary/90 hover:bg-primary'
                   }`}
                   id="mobilecustomerBtn"
                   onClick={() => {
