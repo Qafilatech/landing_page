@@ -58,24 +58,26 @@ const Navbar = ({ activeButton, setActiveButton }) => {
 
           {/* Desktop Navigation */}
           
-          <div className="hidden md:flex md:items-center md:space-x-8">
-            {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
-                className={`nav-link text-sm font-medium ${
-                  scrolled 
-                    ? 'text-foreground/80 hover:text-primary' 
-                    : 'text-white hover:text-white/80'
-                }`}  
-              >
-                {link.name}
-              </a>
-            ))}
+          <div className="hidden md:flex md:items-center">
+            <div className={`hidden md:flex md:items-center ${language === 'ar' ? 'space-x-reverse space-x-8' : 'space-x-8'}`}>
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name} 
+                  href={link.href} 
+                  className={`nav-link text-sm font-medium ${
+                    scrolled 
+                      ? 'text-foreground/80 hover:text-primary' 
+                      : 'text-white hover:text-white/80'
+                  }`}  
+                >
+                  {link.name}
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex md:items-center md:space-x-3">
+          <div className={`hidden md:flex md:items-center ${language === 'ar' ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
             <a 
               href="#features" 
               className={`nav-btn btn-demo-small ${
