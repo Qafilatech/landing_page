@@ -59,7 +59,7 @@ const Features = ({ activeButton }) => {
 
   const truckerSlides = [
     {
-      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      image: "https://plus.unsplash.com/premium_photo-1682144324433-ae1ee89a0238?q=80&w=2940&auto=format&fit=crop&w=800&q=80",
       alt: "Fleet Management",
       title: "Efficient Fleet Management",
       description: "Manage your fleet with ease using our comprehensive dashboard. Monitor vehicle performance, maintenance schedules, and driver activities.",
@@ -83,7 +83,7 @@ const Features = ({ activeButton }) => {
       ]
     },
     {
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1543858671-c460805db8f7?q=80&w=2940&auto=format&fit=crop&w=800&q=80",
       alt: "Route Planning",
       title: "Dynamic Route Planning",
       description: "Plan your routes efficiently with real-time traffic data and weather updates. Save time and fuel while delivering on schedule.",
