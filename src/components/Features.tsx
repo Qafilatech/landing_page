@@ -39,7 +39,6 @@ const Features = ({ activeButton }) => {
     }
   };
 
-<<<<<<< HEAD
   // Customer slides with translations
   const customerSlides = {
     en: [
@@ -119,46 +118,6 @@ const Features = ({ activeButton }) => {
       }
     ]
   };
-=======
-  const truckerSlides = [
-    {
-      image: "https://plus.unsplash.com/premium_photo-1682144324433-ae1ee89a0238?q=80&w=2940&auto=format&fit=crop&w=800&q=80",
-      alt: "Fleet Management",
-      title: "Efficient Fleet Management",
-      description: "Manage your fleet with ease using our comprehensive dashboard. Monitor vehicle performance, maintenance schedules, and driver activities.",
-      highlights: [
-        "Vehicle monitoring",
-        "Maintenance alerts",
-        "Driver management",
-        "Performance tracking"
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: "Load Matching",
-      title: "Smart Load Matching",
-      description: "Find the perfect loads for your routes with our intelligent matching system. Maximize your earnings by reducing empty miles.",
-      highlights: [
-        "Smart load suggestions",
-        "Route optimization",
-        "Earnings calculator",
-        "Real-time availability"
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1543858671-c460805db8f7?q=80&w=2940&auto=format&fit=crop&w=800&q=80",
-      alt: "Route Planning",
-      title: "Dynamic Route Planning",
-      description: "Plan your routes efficiently with real-time traffic data and weather updates. Save time and fuel while delivering on schedule.",
-      highlights: [
-        "Traffic integration",
-        "Weather updates",
-        "Optimal routing",
-        "Schedule planning"
-      ]
-    }
-  ];
->>>>>>> 1b770ef1f78a8cc49a0b5119a4709dd7c69de784
 
   // Trucker slides with translations
   const truckerSlides = {
@@ -363,13 +322,8 @@ const Features = ({ activeButton }) => {
         </div>
       </div>
 
-<<<<<<< HEAD
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${activeButton === 'trucker' ? 'lg:flex-row-reverse' : ''}`}>
-=======
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${activeButton === 'trucker' ? 'lg:flex-row-reverse' : ''}`}>
->>>>>>> 1b770ef1f78a8cc49a0b5119a4709dd7c69de784
           {/* Text Content */}
           <div className={`transition-all duration-500 ease-in-out ${
             isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
