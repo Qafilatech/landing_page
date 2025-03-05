@@ -1,3 +1,13 @@
+/**
+ * Features Component
+ * 
+ * A dynamic section showcasing different features for customers and truckers
+ * with an interactive slideshow, decorative elements, and responsive layout.
+ * 
+ * @param {Object} props
+ * @param {string} props.activeButton - Current active view mode ('customer' or 'trucker')
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Circle, Triangle, Square, Hexagon, Star, Pentagon } from 'lucide-react';
 
@@ -7,6 +17,7 @@ const Features = ({ activeButton }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const slideInterval = useRef<number | null>(null);
 
+  // Slide data for different user types
   const customerSlides = [
     {
       image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -85,20 +96,22 @@ const Features = ({ activeButton }) => {
     }
   ];
 
+  // Select appropriate slides based on active user type
   const slides = activeButton === 'trucker' ? truckerSlides : customerSlides;
 
-  // Reset current slide when switching between customer and trucker
+  // Reset current slide when switching between customer and trucker views
   useEffect(() => {
     setCurrentSlide(0);
   }, [activeButton]);
 
-  // Reset animation when activeButton changes
+  // Handle animation reset when switching views
   useEffect(() => {
     setIsAnimating(false);
     // Brief timeout to trigger re-animation
     setTimeout(() => setIsAnimating(true), 50);
   }, [activeButton]);
 
+  // Slideshow navigation handlers
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
@@ -107,6 +120,7 @@ const Features = ({ activeButton }) => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  // Initialize and manage automatic slideshow
   const startSlideShow = () => {
     if (slideInterval.current !== null) {
       clearInterval(slideInterval.current);
@@ -114,9 +128,10 @@ const Features = ({ activeButton }) => {
     
     slideInterval.current = window.setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 5000); // Change slide every 5 seconds
   };
 
+  // Setup and cleanup slideshow interval
   useEffect(() => {
     startSlideShow();
     
@@ -125,8 +140,9 @@ const Features = ({ activeButton }) => {
         clearInterval(slideInterval.current);
       }
     };
-  }, [activeButton]); // Restart slideshow when activeButton changes
+  }, [activeButton]);
 
+  // Initialize intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {

@@ -1,3 +1,11 @@
+/**
+ * Hero Component
+ * 
+ * The main landing section of the application featuring a video background,
+ * multilingual content, and animated visual elements.
+ * Includes responsive design and scroll-triggered animations.
+ */
+
 import { useEffect, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -5,6 +13,7 @@ const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const {language} = useLanguage();
   
+  // Initialize intersection observer for fade-in animation
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -29,6 +38,7 @@ const Hero = () => {
     };
   }, []);
 
+  // Multilingual content configuration
   const heroTexts = {
     en: {
       tagline: 'Streamline Your Logistics with Ease',
@@ -54,22 +64,21 @@ const Hero = () => {
       className="pt-24 lg:pt-32 pb-16 lg:pb-24 relative overflow-hidden"
       ref={heroRef}
     >
-      {/* Background Image */}
+      {/* Video Background with Overlay */}
       <div className="absolute inset-0 w-full h-full">
         <video autoPlay loop muted
           src="\5171156-hd_1920_1080_30fps.mp4"
           className="w-full h-full object-cover"
         />
-        {/* Dark overlay for better text visibility */}
+        {/* Dark gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50 backdrop-blur-sm"></div>
       </div>
 
-      {/* Background gradient - keeping for additional effect */}
+      {/* Additional visual effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-60 mix-blend-overlay" />
-      
-      {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iLjEiPjxwYXRoIGQ9Ik0zNiAxOGMxLjIgMCAyLjItLjQgMy0xLjIuOC0uOCAxLjItMS44IDEuMi0zcy0uNC0yLjItMS4yLTNjLS44LS44LTEuOC0xLjItMy0xLjJzLTIuMi40LTMgMS4yYy0uOC44LTEuMiAxLjgtMS4yIDNzLjQgMi4yIDEuMiAzYy44LjggMS44IDEuMiAzIDEuMnptMCAyNGMxLjIgMCAyLjItLjQgMy0xLjIuOC0uOCAxLjItMS44IDEuMi0zcy0uNC0yLjItMS4yLTNjLS44LS44LTEuOC0xLjItMy0xLjJzLTIuMi40LTMgMS4yYy0uOC44LTEuMiAxLjgtMS4yIDNzLjQgMi4yIDEuMiAzYy44LjggMS44IDEuMiAzIDEuMnptMTItMTJjMS4yIDAgMi4yLS40IDMtMS4yLjgtLjggMS4yLTEuOCAxLjItM3MtLjQtMi4yLTEuMi0zYy0uOC0uOC0xLjgtMS4yLTMtMS4ycy0yLjIuNC0zIDEuMmMtLjguOC0xLjIgMS44LTEuMiAzcy40IDIuMiAxLjIgM2MuOC44IDEuOCAxLjIgMyAxLjJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] mix-blend-overlay" />
       
+      {/* Main content container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Image Column - Mobile order changed for better UX */}
