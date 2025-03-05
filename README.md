@@ -49,4 +49,4 @@ To start development:
   - **`utils/`**: Helper functions and constants.
 - **Root files**: Configuration files like `.eslintrc.json`, `.gitignore`, `package.json`, `tsconfig.json`, `vite.config.ts`, and `tailwind.config.js`.
 
-Made with 🤘🏿 by Halumi
+Made with 🤘🏿 by Halumi (with the help from The Moist Marauder)
