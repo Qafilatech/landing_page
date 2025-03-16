@@ -27,7 +27,7 @@ const Admin = () => {
 
     const adminTexts = {
         en: {
-          adminPanel: 'Admin Panel',
+          adminPanel: 'dtsts Panel',
           dashboard: 'Dashboard',
           users: 'Users',
           orders: 'Orders',
