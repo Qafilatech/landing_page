@@ -29,7 +29,7 @@ const HowItWorks = () => {
   const HowitWorksText = {
     en: {
       title: 'How it Works',
-      subtitle: '| Process',
+      subtitle: 'Process',
       description: 'Experience seamless logistics with our innovative platform. Follow these simple steps to get started:',
       steps: [
         {
@@ -72,7 +72,7 @@ const HowItWorks = () => {
     },
     ar: {
       title: 'كيف يعمل',
-      subtitle: '| عملية',
+      subtitle: 'عملية',
       description: 'تجربة عمليات اللوجستية بأسلوب جديد وفعال. اتبع هذه الخطوات البسيطة للبدء:',
       steps: [
         {

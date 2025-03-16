@@ -22,16 +22,16 @@ const Features = ({ activeButton }) => {
   // Translation data
   const featuresText = {
     en: {
-      customerTitle: '| Features - For Customers',
-      truckerTitle: '| Features - For Truckers',
+      customerTitle: 'Features - For Customers',
+      truckerTitle: 'Features - For Truckers',
       joinWaitlist: 'Join Waitlist',
       learnMore: 'Learn More',
       forCustomers: 'For Customers',
       forTruckers: 'For Truckers'
     },
     ar: {
-      customerTitle: '| المميزات - للعملاء',
-      truckerTitle: '| المميزات - للسائقين',
+      customerTitle: 'المميزات - للعملاء',
+      truckerTitle: 'المميزات - للسائقين',
       joinWaitlist: 'انضم لقائمة الانتظار',
       learnMore: 'اعرف المزيد',
       forCustomers: 'للعملاء',
@@ -270,47 +270,41 @@ const Features = ({ activeButton }) => {
     <section id="features" className="section-padding bg-gradient-to-b from-white to-gray-50 relative overflow-hidden" ref={sectionRef}>
       {/* Decorative Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Map Pins Cluster */}
-        <div className="absolute top-4 left-4 animate-bounce-slow text-primary/20">
-          <MapPin className="w-3 h-3" />
-        </div>
-        <div className="absolute top-8 left-20 animate-bounce-slow delay-100 text-primary/20">
-          <MapPin className="w-8 h-8" />
-        </div>
-        <div className="absolute top-24 left-12 animate-bounce-slow delay-200 text-primary/20">
-          <MapPin className="w-5 h-5" />
-        </div>
-        <div className="absolute top-32 left-36 animate-bounce-slow delay-300 text-primary/20">
-          <MapPin className="w-10 h-10" />
-        </div>
-        <div className="absolute top-16 left-48 animate-bounce-slow delay-400 text-primary/20">
+        {/* Map Pins Cluster - Adjusted spacing */}
+        <div className="absolute top-8 left-8 animate-bounce-slow text-primary/20">
           <MapPin className="w-4 h-4" />
         </div>
-        <div className="absolute top-48 left-24 animate-bounce-slow delay-500 text-primary/20">
-          <MapPin className="w-7 h-7" />
+        <div className="absolute top-16 left-32 animate-bounce-slow delay-100 text-primary/20">
+          <MapPin className="w-8 h-8" />
         </div>
-        <div className="absolute top-56 left-48 animate-bounce-slow delay-600 text-primary/20">
+        <div className="absolute top-40 left-20 animate-bounce-slow delay-200 text-primary/20">
+          <MapPin className="w-5 h-5" />
+        </div>
+        <div className="absolute top-48 left-48 animate-bounce-slow delay-300 text-primary/20">
+          <MapPin className="w-10 h-10" />
+        </div>
+        <div className="absolute top-24 left-64 animate-bounce-slow delay-400 text-primary/20">
           <MapPin className="w-6 h-6" />
         </div>
 
-        {/* Geometric Shapes Cluster */}
-        <div className="absolute top-12 left-32 animate-spin-slow text-primary/10">
-          <Circle className="w-12 h-12" />
+        {/* Company Logo and Geometric Shapes Cluster - Adjusted spacing */}
+        <div className="absolute top-20 left-40 animate-spin-slow text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-12 h-12 opacity-10" />
         </div>
-        <div className="absolute top-28 left-52 animate-spin-slow delay-150 text-primary/10">
-          <Triangle className="w-8 h-8" />
+        <div className="absolute top-44 left-28 animate-spin-slow delay-150 text-primary/10">
+          <Triangle className="w-10 h-10" />
         </div>
-        <div className="absolute top-44 left-16 animate-spin-slow delay-300 text-primary/10">
-          <Square className="w-16 h-16" />
+        <div className="absolute top-60 left-52 animate-spin-slow delay-300 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-16 h-16 opacity-10" />
         </div>
-        <div className="absolute top-52 left-64 animate-spin-slow delay-450 text-primary/10">
-          <Hexagon className="w-10 h-10" />
+        <div className="absolute top-32 left-72 animate-spin-slow delay-450 text-primary/10">
+          <Hexagon className="w-12 h-12" />
         </div>
-        <div className="absolute top-20 left-72 animate-spin-slow delay-600 text-primary/10">
-          <Star className="w-14 h-14" />
+        <div className="absolute top-12 right-20 animate-spin-slow delay-600 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-14 h-14 opacity-10" />
         </div>
-        <div className="absolute top-64 left-40 animate-spin-slow delay-750 text-primary/10">
-          <Pentagon className="w-12 h-12" />
+        <div className="absolute top-52 right-32 animate-spin-slow delay-750 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-10 h-10 opacity-10" />
         </div>
 
         {/* Dots Pattern */}
