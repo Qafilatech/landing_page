@@ -1,5 +1,16 @@
+/**
+ * Features Component
+ * 
+ * A dynamic section showcasing different features for customers and truckers
+ * with an interactive slideshow, decorative elements, and responsive layout.
+ * 
+ * @param {Object} props
+ * @param {string} props.activeButton - Current active view mode ('customer' or 'trucker')
+ */
+
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight} from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Circle, Triangle, Square, Hexagon, Star, Pentagon } from 'lucide-react';
+
 import { useLanguage } from '@/context/LanguageContext';
 
 const Features = () => {
@@ -8,64 +19,205 @@ const Features = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const slideInterval = useRef<number | null>(null);
   const { language } = useLanguage();
-  const isRTL = language === 'ar';
-  
-  const customerSlides = [
-    {
-      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "إدارة الطلبات" : "Order Management",
-      title: language === 'ar' ? "إدارة الطلبات" : "Order Management",
-      description: language === 'ar' 
-        ? "إدارة جميع طلباتك في مكان واحد بسهولة وكفاءة"
-        : "Manage all your orders in one place with ease and efficiency"
+
+  // Translation data
+  const featuresText = {
+    en: {
+      customerTitle: 'Features - For Customers',
+      truckerTitle: 'Features - For Truckers',
+      joinWaitlist: 'Join Waitlist',
+      learnMore: 'Learn More',
+      forCustomers: 'For Customers',
+      forTruckers: 'For Truckers'
     },
-    {
-      image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "تتبع التوصيل" : "Delivery Tracking",
-      title: language === 'ar' ? "تتبع التوصيل" : "Delivery Tracking",
-      description: language === 'ar' 
-        ? "تتبع طلباتك في الوقت الحقيقي واعرف موقعها بدقة"
-        : "Track your deliveries in real-time and know their location accurately"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "تحسين المسار" : "Route Optimization",
-      title: language === 'ar' ? "تحسين المسار" : "Request Delivery",
-      description: language === 'ar' 
-        ? "اطلب خدمة التوصيل بكل سهولة وفي أي وقت"
-        : "Request delivery service easily and at any time"
+    ar: {
+      customerTitle: 'المميزات - للعملاء',
+      truckerTitle: 'المميزات - للسائقين',
+      joinWaitlist: 'انضم لقائمة الانتظار',
+      learnMore: 'اعرف المزيد',
+      forCustomers: 'للعملاء',
+      forTruckers: 'للسائقين'
+
     }
-  ];
+  };
 
-  const truckerSlides = [
-    {
-      image: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "سجل كسائق" : "Sign Up as Driver",
-      title: language === 'ar' ? "سجل كسائق" : "Sign Up as Driver",
-      description: language === 'ar' 
-        ? "انضم إلى شبكتنا من السائقين المحترفين وابدأ العمل بمرونة"
-        : "Join our network of professional drivers and start working with flexibility"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "قبول الطلبات" : "Accept Orders",
-      title: language === 'ar' ? "قبول الطلبات" : "Accept Orders",
-      description: language === 'ar' 
-        ? "اختر الطلبات التي تناسب جدولك وقم بتوصيلها"
-        : "Choose orders that fit your schedule and deliver them"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1580674285058-f6b9983e9c34?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      alt: language === 'ar' ? "كسب المال" : "Earn Money",
-      title: language === 'ar' ? "كسب المال" : "Earn Money",
-      description: language === 'ar' 
-        ? "احصل على أجر عادل مقابل كل توصيل تقوم به"
-        : "Get fair pay for each delivery you make"
-    }
-  ];
+  // Customer slides with translations
+  const customerSlides = {
+    en: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Logistics Management",
+        title: "Smart Logistics Management",
+        description: "Streamline your supply chain with our intelligent logistics management system. Track shipments in real-time and optimize delivery routes.",
+        highlights: [
+          "Real-time shipment tracking",
+          "Automated route planning",
+          "Delivery status updates",
+          "Performance analytics"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Delivery Tracking",
+        title: "Real-Time Delivery Tracking",
+        description: "Keep your customers informed with precise delivery tracking. Get instant updates and estimated arrival times for all your shipments.",
+        highlights: [
+          "Live GPS tracking",
+          "Instant notifications",
+          "Accurate ETAs",
+          "Customer updates"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Route Optimization",
+        title: "Advanced Route Optimization",
+        description: "Reduce delivery times and costs with our AI-powered route optimization. Make your logistics operations more efficient and sustainable.",
+        highlights: [
+          "AI-powered routing",
+          "Cost optimization",
+          "Fuel efficiency",
+          "Time-saving paths"
+        ]
+      }
+    ],
+    ar: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "إدارة الخدمات اللوجستية",
+        title: "إدارة ذكية للخدمات اللوجستية",
+        description: "قم بتبسيط سلسلة التوريد الخاصة بك مع نظام إدارة الخدمات اللوجستية الذكي. تتبع الشحنات في الوقت الفعلي وتحسين مسارات التسليم.",
+        highlights: [
+          "تتبع الشحنات في الوقت الفعلي",
+          "تخطيط المسار التلقائي",
+          "تحديثات حالة التسليم",
+          "تحليلات الأداء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تتبع التسليم",
+        title: "تتبع التسليم في الوقت الفعلي",
+        description: "أبق عملائك على اطلاع بتتبع التسليم الدقيق. احصل على تحديثات فورية وأوقات وصول متوقعة لجميع شحناتك.",
+        highlights: [
+          "تتبع GPS المباشر",
+          "إشعارات فورية",
+          "أوقات وصول دقيقة",
+          "تحديثات العملاء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تحسين المسار",
+        title: "تحسين متقدم للمسار",
+        description: "قلل من أوقات التسليم والتكاليف مع تحسين المسار المدعوم بالذكاء الاصطناعي. اجعل عملياتك اللوجستية أكثر كفاءة واستدامة.",
+        highlights: [
+          "توجيه مدعوم بالذكاء الاصطناعي",
+          "تحسين التكلفة",
+          "كفاءة الوقود",
+          "مسارات موفرة للوقت"
+        ]
+      }
+    ]
+  };
 
-  const slides = swapped ? truckerSlides : customerSlides;
+  // Trucker slides with translations
+  const truckerSlides = {
+    en: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Fleet Management",
+        title: "Efficient Fleet Management",
+        description: "Manage your fleet with ease using our comprehensive dashboard. Monitor vehicle performance, maintenance schedules, and driver activities.",
+        highlights: [
+          "Vehicle monitoring",
+          "Maintenance alerts",
+          "Driver management",
+          "Performance tracking"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Load Matching",
+        title: "Smart Load Matching",
+        description: "Find the perfect loads for your routes with our intelligent matching system. Maximize your earnings by reducing empty miles.",
+        highlights: [
+          "Smart load suggestions",
+          "Route optimization",
+          "Earnings calculator",
+          "Real-time availability"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "Route Planning",
+        title: "Dynamic Route Planning",
+        description: "Plan your routes efficiently with real-time traffic data and weather updates. Save time and fuel while delivering on schedule.",
+        highlights: [
+          "Traffic integration",
+          "Weather updates",
+          "Optimal routing",
+          "Schedule planning"
+        ]
+      }
+    ],
+    ar: [
+      {
+        image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "إدارة الأسطول",
+        title: "إدارة فعالة للأسطول",
+        description: "أدر أسطولك بسهولة باستخدام لوحة التحكم الشاملة لدينا. راقب أداء المركبات وجداول الصيانة وأنشطة السائقين.",
+        highlights: [
+          "مراقبة المركبات",
+          "تنبيهات الصيانة",
+          "إدارة السائقين",
+          "تتبع الأداء"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "مطابقة الحمولة",
+        title: "مطابقة ذكية للحمولة",
+        description: "اعثر على الحمولات المثالية لمساراتك مع نظام المطابقة الذكي لدينا. زد من أرباحك عن طريق تقليل الأميال الفارغة.",
+        highlights: [
+          "اقتراحات حمولة ذكية",
+          "تحسين المسار",
+          "حاسبة الأرباح",
+          "التوفر في الوقت الفعلي"
+        ]
+      },
+      {
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+        alt: "تخطيط المسار",
+        title: "تخطيط ديناميكي للمسار",
+        description: "خطط لمساراتك بكفاءة مع بيانات حركة المرور في الوقت الفعلي وتحديثات الطقس. وفر الوقت والوقود أثناء التسليم في الموعد المحدد.",
+        highlights: [
+          "تكامل حركة المرور",
+          "تحديثات الطقس",
+          "التوجيه الأمثل",
+          "تخطيط الجدول الزمني"
+        ]
+      }
+    ]
+  };
 
+  // Select appropriate slides based on active user type and language
+  const slides = activeButton === 'trucker' ? truckerSlides[language] : customerSlides[language];
+
+  // Reset current slide when switching between customer and trucker views
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [activeButton]);
+
+  // Handle animation reset when switching views
+  useEffect(() => {
+    setIsAnimating(false);
+    // Brief timeout to trigger re-animation
+    setTimeout(() => setIsAnimating(true), 50);
+  }, [activeButton]);
+
+
+  // Slideshow navigation handlers
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
@@ -74,6 +226,7 @@ const Features = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  // Initialize and manage automatic slideshow
   const startSlideShow = () => {
     if (slideInterval.current !== null) {
       clearInterval(slideInterval.current);
@@ -81,9 +234,10 @@ const Features = () => {
     
     slideInterval.current = window.setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 5000); // Change slide every 5 seconds
   };
 
+  // Setup and cleanup slideshow interval
   useEffect(() => {
     startSlideShow();
     
@@ -92,8 +246,10 @@ const Features = () => {
         clearInterval(slideInterval.current);
       }
     };
-  }, [swapped]); // Restart the slideshow when the user type changes
+  }, [activeButton]);
 
+
+  // Initialize intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -145,51 +301,117 @@ const Features = () => {
   }, []);
 
   return (
-    <section id="features" className="section-padding bg-gradient-to-b from-white to-gray-50" ref={sectionRef}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${swapped ? 'lg:flex-row-reverse' : ''}`}>
+    <section id="features" className="section-padding bg-gradient-to-b from-white to-gray-50 relative overflow-hidden" ref={sectionRef}>
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Map Pins Cluster - Adjusted spacing */}
+        <div className="absolute top-8 left-8 animate-bounce-slow text-primary/20">
+          <MapPin className="w-4 h-4" />
+        </div>
+        <div className="absolute top-16 left-32 animate-bounce-slow delay-100 text-primary/20">
+          <MapPin className="w-8 h-8" />
+        </div>
+        <div className="absolute top-40 left-20 animate-bounce-slow delay-200 text-primary/20">
+          <MapPin className="w-5 h-5" />
+        </div>
+        <div className="absolute top-48 left-48 animate-bounce-slow delay-300 text-primary/20">
+          <MapPin className="w-10 h-10" />
+        </div>
+        <div className="absolute top-24 left-64 animate-bounce-slow delay-400 text-primary/20">
+          <MapPin className="w-6 h-6" />
+        </div>
+
+        {/* Company Logo and Geometric Shapes Cluster - Adjusted spacing */}
+        <div className="absolute top-20 left-40 animate-spin-slow text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-12 h-12 opacity-10" />
+        </div>
+        <div className="absolute top-44 left-28 animate-spin-slow delay-150 text-primary/10">
+          <Triangle className="w-10 h-10" />
+        </div>
+        <div className="absolute top-60 left-52 animate-spin-slow delay-300 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-16 h-16 opacity-10" />
+        </div>
+        <div className="absolute top-32 left-72 animate-spin-slow delay-450 text-primary/10">
+          <Hexagon className="w-12 h-12" />
+        </div>
+        <div className="absolute top-12 right-20 animate-spin-slow delay-600 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-14 h-14 opacity-10" />
+        </div>
+        <div className="absolute top-52 right-32 animate-spin-slow delay-750 text-primary/10">
+          <img src="/singleLogo.png" alt="Logo" className="w-10 h-10 opacity-10" />
+        </div>
+
+        {/* Dots Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${activeButton === 'trucker' ? 'lg:flex-row-reverse' : ''}`}>
           {/* Text Content */}
-          <div className={`animate-on-scroll ${swapped ? 'lg:order-2' : 'lg:order-1'}`}>
-            <h2 className="section-title">
-              {language === 'ar' 
-                ? (swapped ? 'انضم كسائق وابدأ الكسب' : 'اطلب التوصيل بسهولة') 
-                : (swapped ? 'Join as a Driver & Start Earning' : 'Order Delivery with Ease')}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              {language === 'ar' 
-                ? (swapped 
-                    ? 'انضم إلى شبكة السائقين لدينا، واستلم الطلبات، واكسب المال مقابل كل توصيل.'
-                    : 'اطلب خدمة التوصيل، وتتبع طلبك في الوقت الحقيقي، واستلمه في أي مكان تريد.')
-                : (swapped 
-                    ? 'Join our driver network, pick up orders, and earn money for each delivery.'
-                    : 'Request delivery service, track your order in real-time, and receive it wherever you want.')}
-            </p>
-            <div className="flex flex-wrap gap-3 mb-8">
-              <button 
-                onClick={handleCustomerClick}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  !swapped ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {language === 'ar' ? 'للعملاء' : 'For Customers'}
-              </button>
-              <button 
-                onClick={handleTruckerClick}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  swapped ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {language === 'ar' ? 'للسائقين' : 'For Truckers'}
-              </button>
+          <div className={`transition-all duration-500 ease-in-out ${
+            isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          } ${activeButton === 'trucker' ? 'lg:order-2' : 'lg:order-1'}`}>
+            <div className="relative min-h-[250px]">
+              {slides.map((slide, index) => (
+                <div
+                  key={index}
+                  className={`absolute w-full transition-all duration-700 ease-in-out ${
+                    index === currentSlide 
+                      ? 'opacity-100 translate-y-0' 
+                      : 'opacity-0 translate-y-4 pointer-events-none'
+                  }`}
+                >
+                  <div className="inline-block mb-4">
+                    <span className="px-3 py-1 rounded-full text-s font-medium bg-primary/30 text-primary">
+                      {activeButton === 'trucker' ? featuresText[language].truckerTitle : featuresText[language].customerTitle}
+                    </span>
+                  </div>
+                  
+                  <h2 className="section-title">
+                    {slide.title}
+                  </h2>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    {slide.description}
+                  </p>
+
+                  {/* Feature Highlights */}
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    {slide.highlights.map((highlight, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                        <span className="text-sm text-muted-foreground">{highlight}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Buttons */}
+                  <div className="flex flex-wrap gap-4">
+                    <button className="btn-main">
+                      {featuresText[language].joinWaitlist}
+                    </button>
+                    <button className="flex items-center text-primary hover:text-primary/80 transition-colors">
+                      <span>{featuresText[language].learnMore}</span>
+                      <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <a href="#cta" className="btn-main">
-              {language === 'ar' ? 'ابدأ الآن' : 'Get Started Now'}
-            </a>
           </div>
           
           {/* Carousel */}
-          <div className={`animate-on-scroll ${swapped ? 'lg:order-1' : 'lg:order-2'}`}>
-            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+          <div className={`transition-all duration-200 ease-in-out ${
+            isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          } ${activeButton === 'trucker' ? 'lg:order-1' : 'lg:order-2'}`}>
+            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+
               {/* Slide indicators */}
               <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center space-x-2">
                 {slides.map((_, index) => (
@@ -222,7 +444,7 @@ const Features = () => {
               </button>
               
               {/* Slides */}
-              <div className="relative aspect-[16/9] bg-gray-900">
+              <div className="relative w-full h-full">
                 {slides.map((slide, index) => (
                   <div
                     key={index}
@@ -237,8 +459,11 @@ const Features = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
                     <div className="absolute bottom-8 left-8 right-8 text-white">
-                      <h3 className="text-xl font-bold mt-1">{slide.title}</h3>
-                      <p className="mt-2 text-white/80">{slide.description}</p>
+                      <span className="text-sm uppercase tracking-wider opacity-75">
+                        {activeButton === 'trucker' ? featuresText[language].forTruckers : featuresText[language].forCustomers}
+                      </span>
+                      <h3 className="text-xl font-bold mt-1">{slide.alt}</h3>
+
                     </div>
                   </div>
                 ))}

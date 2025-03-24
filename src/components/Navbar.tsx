@@ -33,8 +33,9 @@ const Navbar = ({ activeButton, setActiveButton }) => {
   const navLinks = [
     { name: texts[language].home, href: '#hero' },
     { name: texts[language].features, href: '#features' },
-     { name: texts[language].contactUs, href: '#contactus' },
+    //{ name: texts[language].contactUs, href: '#contactus' },
     // { name: texts[language].pricing, href: '#pricing' },
+    { name: texts[language].howitworks, href: '#howitworks' },
   ];
 
   return (
@@ -48,28 +49,35 @@ const Navbar = ({ activeButton, setActiveButton }) => {
           <div className="flex items-center">
             <a href="#" className="flex items-center">
               <img 
-                src="https://placehold.co/200x60?text=QafilaTech" 
+                src={scrolled ? '/QT-Logo/Dark/LogoDark.png' : '/QT-Logo/Light/LogoLight.png'} 
                 alt="QafilaTech Logo"
-                className="h-8 md:h-10 w-auto"
+                className="h-4 md:h-6 w-auto"
               />
             </a>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
-            {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
-                className="nav-link text-sm font-medium hover:text-primary"
-              >
-                {link.name}
-              </a>
-            ))}
+          
+          <div className="hidden md:flex md:items-center">
+            <div className={`hidden md:flex md:items-center ${language === 'ar' ? 'space-x-reverse space-x-8' : 'space-x-8'}`}>
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name} 
+                  href={link.href} 
+                  className={`nav-link text-sm font-medium ${
+                    scrolled 
+                      ? 'text-foreground/80 hover:text-primary' 
+                      : 'text-white hover:text-white/80'
+                  }`}  
+                >
+                  {link.name}
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex md:items-center md:space-x-3">
+          <div className={`hidden md:flex md:items-center ${language === 'ar' ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
             <a 
               href="#features" 
               className={`nav-btn btn-demo-small ${
@@ -109,11 +117,11 @@ const Navbar = ({ activeButton, setActiveButton }) => {
 
             <button 
               onClick={toggleLanguage}
-              className="p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary"
+              className="p-2 rounded-full bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30 text-primary flex flex-row-reverse items-center"
               aria-label="Toggle Language"
             >
               <Globe className="h-4 w-4" />
-              <span className="ml-1 text-xs">{language === 'en' ? 'AR' : 'EN'}</span>
+              <span className="mr-1 ml-1 text-xs">{language === 'en' ? 'AR' : 'EN'}</span>
             </button>
           </div>
 
@@ -153,8 +161,8 @@ const Navbar = ({ activeButton, setActiveButton }) => {
                   href="#features" 
                   className={`nav-btn btn-demo-small ${
                     activeButton === 'customer' 
-                      ? 'bg-blue-800 text-white border-blue-800' 
-                      : 'bg-white/20 backdrop-blur-sm border border-primary/20 hover:bg-white/30'
+                      ? 'bg-primary' 
+                      : 'bg-primary/90 hover:bg-primary'
                   }`}
                   id="mobilecustomerBtn"
                   onClick={() => {
