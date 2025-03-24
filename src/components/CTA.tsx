@@ -8,8 +8,10 @@
 
 import { useEffect } from 'react';
 import { MapPin, Circle, Triangle, Square } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const CTA = () => {
+  const {language} = useLanguage();
   // Initialize intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,6 +32,23 @@ const CTA = () => {
       elements.forEach(el => observer.unobserve(el));
     };
   }, []);
+
+  const ctaTexts = {
+    en:{
+      tagline: 'Ready to Get Started?',
+      title: 'Join our platform today to streamline your logistics operations and enhance your business growth.',
+      registerCustomer: 'Register as Customer',
+      registerDriver: 'Register as Driver'
+    },
+    ar:{
+      tagline: "مستعد للبدء؟",
+      title: "انضم إلى منصتنا اليوم لتبسيط عملياتك اللوجستية وتعزيز نمو أعمالك.",
+      registerCustomer: "سجل كعميل",
+      registerDriver: "سجل كسائق"
+    }
+
+  }
+
 
   return (
     <section id="cta" className="relative py-20 overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -70,9 +89,9 @@ const CTA = () => {
       {/* Main content container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl mx-auto text-center animate-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Ready to Get Started?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">{ctaTexts[language].tagline}</h2>
           <p className="text-lg text-gray/80 mb-8">
-            Join our platform today to streamline your logistics operations and enhance your business growth.
+            {ctaTexts[language].titles}
           </p>
           
           {/* Registration buttons */}
@@ -83,7 +102,7 @@ const CTA = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Register as Customer
+              {ctaTexts[language].registerCustomer}
             </a>
             <a 
               href="https://forms.office.com/Pages/ResponsePage.aspx?id=ac2XKv0qyUC89jJYHs9XwGkS92JAorlEggy93n8qH3RUN0FQOTBPQUg3MUVXOUtYUEdQOExMUVVVUS4u" 
@@ -91,7 +110,7 @@ const CTA = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Register as Driver
+              {ctaTexts[language].registerDriver}
             </a>
           </div>
         </div>
