@@ -91,7 +91,7 @@ const CTA = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Register as Trucker
+              Register as Driver
             </a>
           </div>
         </div>

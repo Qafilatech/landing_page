@@ -45,7 +45,7 @@ const Hero = () => {
       title: 'Connecting Customers, Truck Drivers, ',
       titleHighlight: 'and Businesses.',
       description: 'Efficiently manage deliveries and logistics with our comprehensive marketplace. Join today to streamline your operations and enhance your business growth.',
-      downloadButton: 'Download Now',
+      downloadButton: 'Register Now',
       learnMoreButton: 'Learn More'
     },
     ar: {
@@ -53,7 +53,7 @@ const Hero = () => {
       title: 'ربط العملاء وسائقي الشاحنات ',
       titleHighlight: 'والشركات.',
       description: 'إدارة عمليات التسليم والخدمات اللوجستية بكفاءة مع منصتنا الشاملة. انضم اليوم لتبسيط عملياتك وتعزيز نمو أعمالك.',
-      downloadButton: 'تحميل الآن',
+      downloadButton: 'سجل الآن',
       learnMoreButton: 'اعرف المزيد'
     }
   };

@@ -22,7 +22,7 @@ const commonTexts = {
     pricing: 'Pricing',
     howitworks: 'How it Works',
     customer: 'Customer',
-    trucker: 'Trucker',
+    trucker: 'Driver',
     signUpLogin: 'Sign Up / Login',
     getStarted: 'Get Started Now',
     learnMore: 'Learn More',
