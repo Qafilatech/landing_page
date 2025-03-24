@@ -10,11 +10,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Circle, Triangle, Square, Hexagon, Star, Pentagon } from 'lucide-react';
+
 import { useLanguage } from '@/context/LanguageContext';
 
-const Features = ({ activeButton }) => {
+const Features = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
+  const [swapped, setSwapped] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const slideInterval = useRef<number | null>(null);
   const { language } = useLanguage();
@@ -36,6 +37,7 @@ const Features = ({ activeButton }) => {
       learnMore: 'اعرف المزيد',
       forCustomers: 'للعملاء',
       forTruckers: 'للسائقين'
+
     }
   };
 
@@ -214,6 +216,7 @@ const Features = ({ activeButton }) => {
     setTimeout(() => setIsAnimating(true), 50);
   }, [activeButton]);
 
+
   // Slideshow navigation handlers
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -245,6 +248,7 @@ const Features = ({ activeButton }) => {
     };
   }, [activeButton]);
 
+
   // Initialize intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -263,6 +267,36 @@ const Features = ({ activeButton }) => {
 
     return () => {
       elements.forEach(el => observer.unobserve(el));
+    };
+  }, []);
+
+  const handleCustomerClick = () => {
+    setSwapped(false);
+    setCurrentSlide(0); // Reset to first slide when switching
+  };
+
+  const handleTruckerClick = () => {
+    setSwapped(true);
+    setCurrentSlide(0); // Reset to first slide when switching
+  };
+
+  // Add event listeners for the buttons from the navbar
+  useEffect(() => {
+    const customerBtn = document.getElementById('customerBtn');
+    const truckerBtn = document.getElementById('truckerBtn');
+    const mobileCustomerBtn = document.getElementById('mobilecustomerBtn');
+    const mobileTruckerBtn = document.getElementById('mobiletruckerBtn');
+    
+    if (customerBtn) customerBtn.addEventListener('click', handleCustomerClick);
+    if (truckerBtn) truckerBtn.addEventListener('click', handleTruckerClick);
+    if (mobileCustomerBtn) mobileCustomerBtn.addEventListener('click', handleCustomerClick);
+    if (mobileTruckerBtn) mobileTruckerBtn.addEventListener('click', handleTruckerClick);
+    
+    return () => {
+      if (customerBtn) customerBtn.removeEventListener('click', handleCustomerClick);
+      if (truckerBtn) truckerBtn.removeEventListener('click', handleTruckerClick);
+      if (mobileCustomerBtn) mobileCustomerBtn.removeEventListener('click', handleCustomerClick);
+      if (mobileTruckerBtn) mobileTruckerBtn.removeEventListener('click', handleTruckerClick);
     };
   }, []);
 
@@ -377,6 +411,7 @@ const Features = ({ activeButton }) => {
             isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           } ${activeButton === 'trucker' ? 'lg:order-1' : 'lg:order-2'}`}>
             <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+
               {/* Slide indicators */}
               <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center space-x-2">
                 {slides.map((_, index) => (
@@ -422,12 +457,13 @@ const Features = ({ activeButton }) => {
                       alt={slide.alt}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
                     <div className="absolute bottom-8 left-8 right-8 text-white">
                       <span className="text-sm uppercase tracking-wider opacity-75">
                         {activeButton === 'trucker' ? featuresText[language].forTruckers : featuresText[language].forCustomers}
                       </span>
                       <h3 className="text-xl font-bold mt-1">{slide.alt}</h3>
+
                     </div>
                   </div>
                 ))}
