@@ -1,7 +1,47 @@
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const {language} = useLanguage();
+
+
+  const footerTexts = {
+    en: {
+      company: 'Company',
+      definition: 'QafilaTech provides innovative logistics solutions connecting businesses, customers, and truck drivers in one seamless platform.',
+      links: 'Quick Links',
+      resources: 'Resources',
+      contact: 'Contact Us',
+      home: 'Home',
+      features: 'Features',
+      howItWorks: 'How It Works',
+      pricing: 'Pricing',
+      blog: 'Blog',
+      helpCenter: 'Help Center',
+      privacyPolicy: 'Privacy Policy',
+      termOfService: 'Terms of Service',
+      location: 'Muscat, Oman',
+      timeOpen: 'Mon-Fri: 9AM - 6PM'
+    },
+    ar: {
+      company: 'الشركة',
+      definition: 'تقدم كفيلة تك حلول لوجستية مبتكرة تربط بين الشركات والعملاء وسائقي الشاحنات في منصة واحدة متكاملة.',
+      links: 'روابط سريعة',
+      resources: 'موارد',
+      contact: 'اتصل بنا',
+      home: 'الرئيسية',
+      features: 'المميزات',
+      howItWorks: 'كيف تعمل',
+      pricing: 'الأسعار',
+      blog: 'المدونة',
+      helpCenter: 'مركز المساعدة',
+      privacyPolicy: 'سياسة الخصوصية',
+      termOfService: 'شروط الخدمة',
+      location: 'مسقط، عُمان',
+      timeOpen: 'من الاثنين إلى الجمعة: 9 صباحًا - 6 مساءً'
+    }
+  };
   
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
@@ -9,10 +49,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1">
-            <h5 className="text-lg font-medium mb-4">Company</h5>
+            <h5 className="text-lg font-medium mb-4">{footerTexts[language].Links}</h5>
             <p className="text-gray-400 mb-4">
-              QafilaTech provides innovative logistics solutions connecting businesses, 
-              customers, and truck drivers in one seamless platform.
+              {footerTexts[language].definition}
             </p>
             <p className="text-gray-400">
               <a href="mailto:contact@qafilatech.com" className="text-primary hover:text-primary/80 transition-colors">
@@ -23,32 +62,32 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h5 className="text-lg font-medium mb-4">Quick Links</h5>
+            <h5 className="text-lg font-medium mb-4">{footerTexts[language].Quick}</h5>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].home}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].feature}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].howItWorks}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].pricing}</a></li>
             </ul>
           </div>
 
           {/* Resources */}
           <div>
-            <h5 className="text-lg font-medium mb-4">Resources</h5>
+            <h5 className="text-lg font-medium mb-4">{footerTexts[language].resources}</h5>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].blog}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].helpCenter}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].privacyPolicy}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].termOfService}</a></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h5 className="text-lg font-medium mb-4">Contact Us</h5>
+            <h5 className="text-lg font-medium mb-4">{footerTexts[language].contact}</h5>
             <ul className="space-y-2 text-gray-400">
-              <li>Ghala , Muscat, Oman</li>
-              <li>Mon-Fri: 9AM - 6PM</li>
+              <li>{footerTexts[language].location}</li>
+              <li>{footerTexts[language].timeOpen}</li>
             </ul>
           </div>
         </div>
