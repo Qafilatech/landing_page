@@ -62,7 +62,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h5 className="text-lg font-medium mb-4">{footerTexts[language].Quick}</h5>
+            <h5 className="text-lg font-medium mb-4">{footerTexts[language].links}</h5>
             <ul className="space-y-2 text-gray-400">
               <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].home}</a></li>
               <li><a href="#" className="hover:text-white transition-colors">{footerTexts[language].feature}</a></li>
