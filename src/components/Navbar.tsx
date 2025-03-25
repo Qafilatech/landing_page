@@ -36,6 +36,7 @@ const Navbar = ({ activeButton, setActiveButton }) => {
     //{ name: texts[language].contactUs, href: '#contactus' },
     // { name: texts[language].pricing, href: '#pricing' },
     { name: texts[language].howitworks, href: '#howitworks' },
+    { name: texts[language].aboutUs, href: '#about' },
   ];
 
   return (

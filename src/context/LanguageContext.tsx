@@ -1,3 +1,4 @@
+import AboutUs from '@/components/AboutUs';
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 type LanguageContextType = {
@@ -21,6 +22,7 @@ const commonTexts = {
     testimonials: 'Testimonials',
     pricing: 'Pricing',
     howitworks: 'How it Works',
+    about:'About Us',
     customer: 'Customer',
     trucker: 'Trucker',
     signUpLogin: 'Sign Up / Login',
@@ -40,6 +42,7 @@ const commonTexts = {
     testimonials: 'الشهادات',
     pricing: 'الأسعار',
     howitworks: 'كيف يعمل',
+    about:'About Us',
     customer: 'العميل',
     trucker: 'سائق الشاحنة',
     signUpLogin: 'تسجيل / دخول',
