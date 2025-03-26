@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     allowedHosts: [
-      "robust-bandicoot-qafila-c8800ffd.koyeb.app",  
+      "www.qafila.tech",  
     ],
   },
   plugins: [
