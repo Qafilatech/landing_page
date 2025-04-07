@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Navigate, Link} from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import {useToast} from '@/hooks/use-toast';
-import { ArrowLeft, Users, Package, BarChart, Settings  } from 'lucide-react';
+import { ArrowLeft, Truck, Package, BarChart, Settings  } from 'lucide-react';
 
 // Mock admin check - in a real app, this would be tied to authentication
 const isAdmin = () => {
@@ -27,15 +27,15 @@ const Admin = () => {
 
     const adminTexts = {
         en: {
-          adminPanel: 'dtsts Panel',
+          adminPanel: 'Admin Panel',
           dashboard: 'Dashboard',
-          users: 'Users',
+          drivers: 'Drivers',
           orders: 'Orders',
           settings: 'Settings',
           backToHome: 'Back to home',
           welcomeAdmin: 'Welcome to the Admin Panel',
           overview: 'System Overview',
-          totalUsers: 'Total Users',
+          totalDrivers: 'Total Drivers',
           totalOrders: 'Total Orders',
           revenue: 'Revenue',
           recentActivity: 'Recent Activity',
@@ -44,13 +44,13 @@ const Admin = () => {
         ar: {
           adminPanel: 'لوحة الإدارة',
           dashboard: 'لوحة القيادة',
-          users: 'المستخدمين',
+          drivers: 'المستخدمين',
           orders: 'الطلبات',
           settings: 'الإعدادات',
           backToHome: 'العودة إلى الصفحة الرئيسية',
           welcomeAdmin: 'مرحبًا بك في لوحة الإدارة',
           overview: 'نظرة عامة على النظام',
-          totalUsers: 'إجمالي المستخدمين',
+          totalDrivers: 'إجمالي السائقين',
           totalOrders: 'إجمالي الطلبات',
           revenue: 'الإيرادات',
           recentActivity: 'النشاط الأخير',
@@ -60,7 +60,7 @@ const Admin = () => {
 
        // Demo data for admin dashboard
     const stats = {
-        totalUsers: 1245,
+        totalDrivers: 1245,
         totalOrders: 834,
         revenue: '$42,582'
     };
@@ -75,10 +75,10 @@ const Admin = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white p-4 rounded-lg shadow">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-gray-500">{adminTexts[language].totalUsers}</h3>
-                      <Users className="h-5 w-5 text-blue-500" />
+                      <h3 className="text-gray-500">{adminTexts[language].totalDrivers}</h3>
+                      <Truck className="h-5 w-5 text-blue-500" />
                     </div>
-                    <p className="text-2xl font-bold mt-2">{stats.totalUsers}</p>
+                    <p className="text-2xl font-bold mt-2">{stats.totalDrivers}</p>
                   </div>
                   
                   <div className="bg-white p-4 rounded-lg shadow">
@@ -104,8 +104,8 @@ const Admin = () => {
                 </div>
               </div>
             );
-          case 'users':
-            return <div className="p-4 bg-white rounded-lg shadow"><p>Users management would go here</p></div>;
+          case 'drivers':
+            return <div className="p-4 bg-white rounded-lg shadow"><p>Drivers management would go here</p></div>;
           case 'orders':
             return <div className="p-4 bg-white rounded-lg shadow"><p>Orders management would go here</p></div>;
           case 'settings':
@@ -132,11 +132,11 @@ const Admin = () => {
                 </button>
                 
                 <button
-                  onClick={() => setActiveTab('users')}
-                  className={`w-full flex items-center space-x-2 p-2 rounded ${activeTab === 'users' ? 'bg-primary text-white' : 'hover:bg-gray-100'}`}
+                  onClick={() => setActiveTab('drivers')}
+                  className={`w-full flex items-center space-x-2 p-2 rounded ${activeTab === 'drivers' ? 'bg-primary text-white' : 'hover:bg-gray-100'}`}
                 >
-                  <Users className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                  <span>{adminTexts[language].users}</span>
+                  <Truck className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  <span>{adminTexts[language].drivers}</span>
                 </button>
                 
                 <button

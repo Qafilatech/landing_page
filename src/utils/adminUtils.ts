@@ -1,7 +1,7 @@
 /**
  * Utility functions for managing admin status
  * Note: In a real application, this would be part of a secure authentication system
- * and not rely on localStorage which can be easily manipulated by users
+ * and not rely on localStorage which can be easily manipulated by drivers
  */
 
 
