@@ -86,7 +86,7 @@ const OrdersManagement = ({ language }: { language: string }) => {
         total: 45.75
       },
       customerContact: {
-        phone: '+1 (555) 123-4567',
+        phone: '+(968) 123454567',
         email: 'john.smith@example.com'
       },
       specialInstructions: 'Please leave at door. Ring doorbell.',
@@ -406,7 +406,7 @@ const OrdersManagement = ({ language }: { language: string }) => {
   const formatCurrency = (value) => {
     return new Intl.NumberFormat(language === 'en' ? 'en-US' : 'ar-SA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'OMR',
       minimumFractionDigits: 2,
     }).format(value);
   };

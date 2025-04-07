@@ -257,7 +257,7 @@ const SettingsManagement = ({ language }) => {
       companyName: 'Fast Delivery Inc.',
       contactEmail: 'contact@fastdelivery.com',
       contactPhone: '+(968) 1234 54567',
-      address: '123 Delivery St, Logisticsville, CA 90210',
+      address: 'Ghala Muscat, Oman',
       timeZone: 'UTC-8 (Pacific Standard Time)',
       currency: 'OMR',
       defaultMapZoom: '12',

@@ -48,7 +48,7 @@ const Admin = () => {
       month: 'Month',
       year: 'Year',
       ordersLabel: 'Orders',
-      revenue: '$',
+      revenue: 'Revenue',
       comparedTo: 'compared to',
       yesterday: 'yesterday',
       lastWeek: 'last week'
@@ -82,7 +82,7 @@ const Admin = () => {
       month: 'شهر',
       year: 'سنة',
       ordersLabel: 'طلبات',
-      revenue: '$ ',
+      revenue: 'الإيرادات ',
       comparedTo: 'مقارنة مع',
       yesterday: 'الأمس',
       lastWeek: 'الأسبوع الماضي',
@@ -93,7 +93,7 @@ const Admin = () => {
   const formatCurrency = (value) => {
     return new Intl.NumberFormat(language === 'en' ? 'en-US' : 'ar-SA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'OMR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);

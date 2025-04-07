@@ -12,7 +12,7 @@ const DriversManagement = ({ language }) => {
     {
       id: 'DRV001',
       name: 'John Smith',
-      phone: '+1 (555) 123-4567',
+      phone: '+(968) 123454567',
       email: 'john.smith@example.com',
       vehicle: 'Honda Civic - ABC123',
       status: 'Online',
@@ -29,7 +29,7 @@ const DriversManagement = ({ language }) => {
       metrics: {
         onTimeRate: '95%',
         avgDeliveryTime: '28 min',
-        totalRevenue: '$1,845.50'
+        totalRevenue: '1,845.50'
       }
     },
     {
@@ -52,7 +52,7 @@ const DriversManagement = ({ language }) => {
       metrics: {
         onTimeRate: '98%',
         avgDeliveryTime: '25 min',
-        totalRevenue: '$1,520.75'
+        totalRevenue: '1,520.75'
       }
     },
     {
@@ -75,7 +75,7 @@ const DriversManagement = ({ language }) => {
       metrics: {
         onTimeRate: '92%',
         avgDeliveryTime: '30 min',
-        totalRevenue: '$2,145.20'
+        totalRevenue: '2,145.20'
       }
     },
     {
@@ -98,7 +98,7 @@ const DriversManagement = ({ language }) => {
       metrics: {
         onTimeRate: '94%',
         avgDeliveryTime: '27 min',
-        totalRevenue: '$975.50'
+        totalRevenue: '975.50'
       }
     },
     {
@@ -121,7 +121,7 @@ const DriversManagement = ({ language }) => {
       metrics: {
         onTimeRate: '90%',
         avgDeliveryTime: '32 min',
-        totalRevenue: '$1,685.75'
+        totalRevenue: '1,685.75'
       }
     }
   ];
@@ -483,7 +483,7 @@ const DriversManagement = ({ language }) => {
                           {delivery.date}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${delivery.amount.toFixed(2)}
+                          {delivery.amount.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
