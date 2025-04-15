@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Truck, Package, BarChart, Settings } from 'lucide-react';
+import { ArrowLeft, Truck, Package, BarChart, Settings, Users } from 'lucide-react';
 import Dashboard from './dashboardPages/Dashboard';
 import DriversManagement from './dashboardPages/Drivers';
 import OrdersManagement from './dashboardPages/Orders';
 import SettingsManagement from './dashboardPages/Settings';
+import ActiveVehiclesManagement from './dashboardPages/Vehicles';
 
 const isAdmin = () => {
   return localStorage.getItem('userRole') === 'admin';
@@ -15,7 +16,7 @@ const isAdmin = () => {
 const Admin = () => {
   const { language, texts } = useLanguage();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'drivers' | 'orders' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'drivers' | 'vehicles' |'orders' | 'settings'>('dashboard');
   const [dateRange, setDateRange] = useState('week');
 
   const adminTexts = {
@@ -51,7 +52,8 @@ const Admin = () => {
       revenue: 'Revenue',
       comparedTo: 'compared to',
       yesterday: 'yesterday',
-      lastWeek: 'last week'
+      lastWeek: 'last week',
+      vehicles: 'Vehicles'
     },
     ar: {
       adminPanel: 'لوحة الإدارة',
@@ -86,7 +88,8 @@ const Admin = () => {
       comparedTo: 'مقارنة مع',
       yesterday: 'الأمس',
       lastWeek: 'الأسبوع الماضي',
-      totalDeliveries: 'التوصيلات'
+      totalDeliveries: 'التوصيلات',
+      vehicles: 'المركبات'
     }
   };
 
@@ -115,9 +118,11 @@ const Admin = () => {
         return <OrdersManagement language={language} />;
       case 'settings':
         return <SettingsManagement language={language} />;
+      case 'vehicles':
+        return <ActiveVehiclesManagement language={language}/>
       default:
         return null;
-    }
+    }  
   };
 
   if (!isAdmin()) {
@@ -144,8 +149,16 @@ const Admin = () => {
               onClick={() => setActiveTab('drivers')}
               className={`w-full flex items-center space-x-2 p-2 rounded ${activeTab === 'drivers' ? 'bg-primary text-white' : 'hover:bg-gray-100'}`}
             >
-              <Truck className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+              <Users className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
               <span>{adminTexts[language].drivers}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('vehicles')}
+              className={`w-full flex items-center space-x-2 p-2 rounded ${activeTab === 'vehicles' ? 'bg-primary text-white' : 'hover:bg-gray-100'}`}
+            >
+              <Truck className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+              <span>{adminTexts[language].vehicles}</span>
             </button>
             
             <button

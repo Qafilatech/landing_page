@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { ArrowLeft, Truck, Package, BarChart, Settings, DollarSign, 
-  TrendingUp, 
+import {  Package, BarChart, Settings, DollarSign, 
   CheckCircle, 
   Clock, 
   XCircle,
