@@ -277,16 +277,16 @@ const SettingsManagement = ({ language }) => {
 
   const orderForm = useForm({
     resolver: zodResolver(orderSettingsSchema),
-    defaultValues: {
-      orderStatuses: 'Pending, Processing, Out for Delivery, Delivered, Cancelled',
-      baseFee: '5.00',
-      perKmFee: '0.50',
-      minimumOrderValue: '15.00',
-      cancellationTimeLimit: '15',
-      cancellationFee: '3.00',
-      notifyCustomerOnStatusChange: true,
-      notifyDriverOnAssignment: true,
-    },
+    // defaultValues: {
+    //   orderStatuses: 'Pending, Processing, Out for Delivery, Delivered, Cancelled',
+    //   baseFee: '5.00',
+    //   perKmFee: '0.50',
+    //   minimumOrderValue: '15.00',
+    //   cancellationTimeLimit: '15',
+    //   cancellationFee: '3.00',
+    //   notifyCustomerOnStatusChange: true,
+    //   notifyDriverOnAssignment: true,
+    // },
   });
 
   const integrationForm = useForm({
@@ -653,7 +653,7 @@ const SettingsManagement = ({ language }) => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField
+                {/* <FormField
                   control={orderForm.control}
                   name="baseFee"
                   render={({ field }) => (
@@ -665,8 +665,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                <FormField
+                /> */}
+                {/* <FormField
                   control={orderForm.control}
                   name="perKmFee"
                   render={({ field }) => (
@@ -678,8 +678,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                <FormField
+                /> */}
+                {/* <FormField
                   control={orderForm.control}
                   name="minimumOrderValue"
                   render={({ field }) => (
@@ -691,11 +691,11 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
+                {/* <FormField
                   control={orderForm.control}
                   name="cancellationTimeLimit"
                   render={({ field }) => (
@@ -707,8 +707,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                <FormField
+                /> */}
+                {/* <FormField
                   control={orderForm.control}
                   name="cancellationFee"
                   render={({ field }) => (
@@ -720,11 +720,11 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
+                {/* <FormField
                   control={orderForm.control}
                   name="notifyCustomerOnStatusChange"
                   render={({ field }) => (
@@ -740,8 +740,8 @@ const SettingsManagement = ({ language }) => {
                       </div>
                     </FormItem>
                   )}
-                />
-                <FormField
+                /> */}
+                {/* <FormField
                   control={orderForm.control}
                   name="notifyDriverOnAssignment"
                   render={({ field }) => (
@@ -757,7 +757,7 @@ const SettingsManagement = ({ language }) => {
                       </div>
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
               
               <Button type="submit" className="flex items-center gap-2">
