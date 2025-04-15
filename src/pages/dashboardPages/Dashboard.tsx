@@ -7,8 +7,8 @@ import { ArrowLeft, Truck, Package, BarChart, Settings, DollarSign,
   UserPlus,
   Users,
   Map } from 'lucide-react';
-import { LineChart, Line, BarChart as ReBarChart, Bar, PieChart, 
-  Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart as ReBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 
   // Mock data for the dashboard
@@ -44,9 +44,9 @@ const mockData = {
     ],
     
     orderStatus: [
-      { name: 'Completed', value: 2890 },
-      { name: 'Pending', value: 345 },
-      { name: 'Cancelled', value: 221 },
+      { name: 'Completed', value: 2890, color: '#4CAF50' },
+      { name: 'Pending', value: 345, color: '#2196F3' },
+      { name: 'Cancelled', value: 221, color: '#F44336' },
     ],
     
     topDrivers: [
@@ -245,24 +245,27 @@ const Dashboard = ({ language, adminTexts, dateRange, setDateRange, formatCurren
           <h3 className="font-medium mb-4">{adminTexts[language].orderStatus}</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={mockData.orderStatus}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {mockData.orderStatus.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.name]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => value} />
-                <Legend />
-              </PieChart>
+            <ReBarChart
+                      data={mockData.orderStatus}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+
+                 <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => value} />
+                      <Legend />
+                      <Bar dataKey="value" name={adminTexts[language].ordersLabel}>
+                    {mockData.orderStatus.map((entry, index) =>(
+                      <Cell key={`cell-${index}`} fill={entry.color || STATUS_COLORS[entry.name]}/>
+                    ))}
+                  </Bar>
+              </ReBarChart>
             </ResponsiveContainer>
           </div>
         </div>
