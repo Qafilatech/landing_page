@@ -126,9 +126,9 @@ const Admin = () => {
 
   return (
     <div className={`min-h-screen bg-gray-100 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row h-screen">
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-white p-4 shadow-md md:min-h-screen">
+        <div className="w-full md:w-64 bg-white p-4 shadow-md md:sticky md:top-0 md:h-screen overflow-y-auto">
           <h1 className="text-xl font-bold mb-8">{adminTexts[language].adminPanel}</h1>
           
           <nav className="space-y-2">
