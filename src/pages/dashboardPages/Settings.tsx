@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Tabs,
@@ -31,19 +30,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Building2, 
-  Clock, 
-  DollarSign, 
-  Map, 
-  Users, 
+  Users,
+  User,
   PackageCheck, 
   Bell, 
-  Cog, 
   Plug, 
   Save, 
-  Trash2
+  Trash2,
+  Languages,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Define schemas for the different settings sections
 const generalSettingsSchema = z.object({
@@ -93,6 +98,10 @@ const notificationSettingsSchema = z.object({
   weeklyReportEmail: z.boolean(),
 });
 
+const languageSettingsSchema = z.object({
+  language: z.string().min(1, { message: "Language selection is required" }),
+});
+
 const userManagementSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
   email: z.string().email({ message: "Valid email is required" }),
@@ -111,10 +120,11 @@ const mockAdminUsers = [
   { id: 3, username: 'operator', email: 'operator@example.com', role: 'Operator' },
 ];
 
-const SettingsManagement = ({ language }) => {
+const SettingsManagement = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [adminUsers, setAdminUsers] = useState(mockAdminUsers);
+  const { language, setLanguage } = useLanguage();
   
   // Define language texts
   const settingsTexts = {
@@ -181,6 +191,13 @@ const SettingsManagement = ({ language }) => {
       userDeletedSuccess: 'User deleted successfully',
       userAddedSuccess: 'User added successfully',
       settingsSavedSuccess: 'Settings saved successfully',
+      language: 'Language',
+      languageSettings: 'Language Settings',
+      selectLanguage: 'Select Language',
+      english: 'English',
+      arabic: 'Arabic',
+      defaultLanguage: 'Default Language',
+      switchLanguage: 'Switch Language',
     },
     ar: {
       settings: 'الإعدادات',
@@ -245,6 +262,13 @@ const SettingsManagement = ({ language }) => {
       userDeletedSuccess: 'تم حذف المستخدم بنجاح',
       userAddedSuccess: 'تم إضافة المستخدم بنجاح',
       settingsSavedSuccess: 'تم حفظ الإعدادات بنجاح',
+      language: 'اللغة',
+      languageSettings: 'إعدادات اللغة',
+      selectLanguage: 'اختر اللغة',
+      english: 'الإنجليزية',
+      arabic: 'العربية',
+      defaultLanguage: 'اللغة الافتراضية',
+      switchLanguage: 'تبديل اللغة',
     }
   };
   
@@ -277,16 +301,16 @@ const SettingsManagement = ({ language }) => {
 
   const orderForm = useForm({
     resolver: zodResolver(orderSettingsSchema),
-    // defaultValues: {
-    //   orderStatuses: 'Pending, Processing, Out for Delivery, Delivered, Cancelled',
-    //   baseFee: '5.00',
-    //   perKmFee: '0.50',
-    //   minimumOrderValue: '15.00',
-    //   cancellationTimeLimit: '15',
-    //   cancellationFee: '3.00',
-    //   notifyCustomerOnStatusChange: true,
-    //   notifyDriverOnAssignment: true,
-    // },
+    defaultValues: {
+      orderStatuses: 'Pending, Processing, Out for Delivery, Delivered, Cancelled',
+      baseFee: '5.00',
+      perKmFee: '0.50',
+      minimumOrderValue: '15.00',
+      cancellationTimeLimit: '15',
+      cancellationFee: '3.00',
+      notifyCustomerOnStatusChange: true,
+      notifyDriverOnAssignment: true,
+    },
   });
 
   const integrationForm = useForm({
@@ -310,6 +334,13 @@ const SettingsManagement = ({ language }) => {
       alertOnLowInventory: false,
       dailyReportEmail: true,
       weeklyReportEmail: true,
+    },
+  });
+
+  const languageForm = useForm({
+    resolver: zodResolver(languageSettingsSchema),
+    defaultValues: {
+      language: language,
     },
   });
 
@@ -387,6 +418,15 @@ const SettingsManagement = ({ language }) => {
     });
   };
 
+  const onLanguageSubmit = (data) => {
+    console.log('Language Settings:', data);
+    setLanguage(data.language);
+    toast({
+      title: t.settingsSavedSuccess,
+      description: t.languageSettings,
+    });
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-semibold mb-6">{t.settings}</h1>
@@ -406,7 +446,7 @@ const SettingsManagement = ({ language }) => {
             <span>{t.orders}</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
+            <User className="h-4 w-4" />
             <span>{t.users}</span>
           </TabsTrigger>
           <TabsTrigger value="integrations" className="flex items-center gap-2">
@@ -416,6 +456,10 @@ const SettingsManagement = ({ language }) => {
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Bell className="h-4 w-4" />
             <span>{t.notifications}</span>
+          </TabsTrigger>
+          <TabsTrigger value="language" className="flex items-center gap-2">
+            <Languages className='h-4 w-4'/>
+            <span>{t.language}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -653,7 +697,7 @@ const SettingsManagement = ({ language }) => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* <FormField
+                <FormField
                   control={orderForm.control}
                   name="baseFee"
                   render={({ field }) => (
@@ -665,8 +709,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
-                {/* <FormField
+                />
+                <FormField
                   control={orderForm.control}
                   name="perKmFee"
                   render={({ field }) => (
@@ -678,8 +722,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
-                {/* <FormField
+                />
+                <FormField
                   control={orderForm.control}
                   name="minimumOrderValue"
                   render={({ field }) => (
@@ -691,11 +735,11 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* <FormField
+                <FormField
                   control={orderForm.control}
                   name="cancellationTimeLimit"
                   render={({ field }) => (
@@ -707,8 +751,8 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
-                {/* <FormField
+                />
+                <FormField
                   control={orderForm.control}
                   name="cancellationFee"
                   render={({ field }) => (
@@ -720,11 +764,11 @@ const SettingsManagement = ({ language }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* <FormField
+                <FormField
                   control={orderForm.control}
                   name="notifyCustomerOnStatusChange"
                   render={({ field }) => (
@@ -740,8 +784,8 @@ const SettingsManagement = ({ language }) => {
                       </div>
                     </FormItem>
                   )}
-                /> */}
-                {/* <FormField
+                />
+                <FormField
                   control={orderForm.control}
                   name="notifyDriverOnAssignment"
                   render={({ field }) => (
@@ -757,7 +801,7 @@ const SettingsManagement = ({ language }) => {
                       </div>
                     </FormItem>
                   )}
-                /> */}
+                />
               </div>
               
               <Button type="submit" className="flex items-center gap-2">
@@ -772,11 +816,11 @@ const SettingsManagement = ({ language }) => {
         <TabsContent value="users" className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5" />
+              <User className="h-5 w-5" />
               {t.userManagement}
             </h2>
             <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
+              <User className="h-4 w-4" />
               {t.addUser}
             </Button>
           </div>
@@ -1120,6 +1164,51 @@ const SettingsManagement = ({ language }) => {
                 />
               </div>
               
+              <Button type="submit" className="flex items-center gap-2">
+                <Save className="h-4 w-4" />
+                {t.save}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
+
+        {/* Language Settings */}
+        <TabsContent value="language" className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Languages className="h-5 w-5" />
+            {t.languageSettings}
+          </h2>
+          <Form {...languageForm}>
+            <form onSubmit={languageForm.handleSubmit(onLanguageSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <FormField
+                  control={languageForm.control}
+                  name="language"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t.selectLanguage}</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                       <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t.selectLanguage} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="en">{t.english}</SelectItem>
+                          <SelectItem value="ar">{t.arabic}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        {t.defaultLanguage}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <Button type="submit" className="flex items-center gap-2">
                 <Save className="h-4 w-4" />
                 {t.save}
