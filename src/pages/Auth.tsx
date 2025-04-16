@@ -1,26 +1,29 @@
 import { useState } from 'react';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Shield} from 'lucide-react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
+import {supabase} from "@/connection/supabase"
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Initialize showPassword
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Initialize confirmPassword
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { language, setLanguage, texts} = useLanguage();
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
     setEmail('');
     setPassword('');
-    setConfirmPassword('');
+    setConfirmPassword(''); // Reset confirm password on form toggle
     setAdminStatus(false);
   };
 
@@ -32,38 +35,53 @@ const Auth = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // Make handleSubmit async
     e.preventDefault();
-    
+    setError("");
+    setSuccess("");
+
     if (isSignUp && password !== confirmPassword) {
-      toast({
-        title: language == 'en' ? "Passwords don't match" : "كلمات المرور غير متطابقة",
-        description: language == 'en' ? "Please make sure your passwords match" : "يرجى التأكد من تطابق كلمات المرور",
-        variant: "destructive",
-      });
+      setError(language === "ar" ? "كلمة المرور وتأكيد كلمة المرور غير متطابقين." : "Password and confirm password do not match.");
       return;
     }
 
-    setAdminStatus(isAdmin);
+    try {
+      let result;
+      if (isSignUp) {
+        result = await supabase.auth.signUp({
+          email,
+          password,
+        });
+      } else {
+        result = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+      }
 
-    // Here you would typically connect to an authentication service
-    toast({
-      title: isSignUp 
-      ? (language == 'en' ? "Account created!" : "تم إنشاء الحساب!")
-      : (language == 'en' ? "Welcome back!": "مرحبا بعودتك!"),
-      description: isSignUp 
-        ? (language == 'en' ? "Your account has been created successfully" :  "تم إنشاء حسابك بنجاح")
-        : (language == 'en' ? "You've successfully logged in":  "لقد قمت بتسجيل الدخول بنجاح"),
-    });
+      const { error: authError, data } = result;
 
-    // For demo purposes only - would normally redirect after auth
-    console.log("Form submitted with:", { email, password });
-
-
-    if(isAdmin){
-        navigate('/admin');
-    } else{
-        navigate('/');
+      if (authError) {
+        setError(authError.message);
+      } else {
+        setSuccess(
+          isSignUp
+            ? language === "ar"
+              ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
+              : "Signup successful! Check your email to confirm."
+            : language === "ar"
+              ? "تم تسجيل الدخول بنجاح!"
+              : "Login successful!"
+        );
+        console.log("User:", data?.user); // Use optional chaining in case data is null
+        // Optionally navigate the user after successful login/signup
+        if (!authError && data?.session) {
+          navigate('/dashboard'); // Replace '/dashboard' with your desired route
+        }
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError(language === "ar" ? "حدث خطأ ما." : "Something went wrong.");
     }
   };
 
@@ -116,8 +134,8 @@ const Auth = () => {
           <ArrowLeft className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4 ${language === 'ar' ? 'transform rotate-180' : ''}`} />
           {texts[language].backToHome}
         </Link>
-        
-        <button 
+
+        <button
           onClick={toggleLanguage}
           className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-white/80 text-primary`}
         >
@@ -131,6 +149,30 @@ const Auth = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  {/* You can add an error icon here */}
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {success && (
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  {/* You can add a success icon here */}
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">{success}</p>
+                </div>
+              </div>
+            </div>
+          )}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
@@ -189,8 +231,6 @@ const Auth = () => {
               </div>
             </div>
 
-
-
             {isSignUp && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
@@ -230,7 +270,7 @@ const Auth = () => {
                 <p className="text-xs text-gray-500">{authTexts[language].adminNote}</p>
               </div>
             </div>
-            
+
 
             <div>
               <button
@@ -262,7 +302,7 @@ const Auth = () => {
               {language === 'en' ? 'Join Our Platform' : 'انضم إلى منصتنا'}
               </h2>
               <p className="text-white/90">
-              {language === 'en' 
+              {language === 'en'
                   ? 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.'
                   : 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.'}              </p>
             </div>
