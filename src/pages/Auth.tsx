@@ -73,10 +73,10 @@ const Auth = () => {
               ? "تم تسجيل الدخول بنجاح!"
               : "Login successful!"
         );
-        console.log("User:", data?.user); // Use optional chaining in case data is null
-        // Optionally navigate the user after successful login/signup
+        console.log("User:", data?.user);
+
         if (!authError && data?.session) {
-          navigate('/dashboard'); // Replace '/dashboard' with your desired route
+          navigate('/admin'); 
         }
       }
     } catch (err) {
