@@ -4,14 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
-import {supabase} from "@/connection/supabase"
+import { registerUser, loginUser } from '@/lib/api'; // Assuming you created these API functions
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Initialize showPassword
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // Initialize confirmPassword
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { language, setLanguage, texts} = useLanguage();
@@ -23,7 +23,7 @@ const Auth = () => {
     setIsSignUp(!isSignUp);
     setEmail('');
     setPassword('');
-    setConfirmPassword(''); // Reset confirm password on form toggle
+    setConfirmPassword('');
     setAdminStatus(false);
   };
 
@@ -35,55 +35,67 @@ const Auth = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
   };
 
-  const handleSubmit = async (e) => { // Make handleSubmit async
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (isSignUp && password !== confirmPassword) {
+    try {
+      const data = await loginUser({ email, password }); // Call your backend login API
+      localStorage.setItem('authToken', data.token); // Store the token received from the backend
+      setSuccess(
+        language === "ar"
+          ? "تم تسجيل الدخول بنجاح!"
+          : "Login successful!"
+      );
+
+      if (isAdmin) {
+        setAdminStatus(true); // You might need to handle admin status differently based on your backend response
+      }
+
+      navigate('/');
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      setError(
+        language === "ar"
+          ? `خطأ في تسجيل الدخول: ${error}`
+          : `Sign in error: ${error}`
+      );
+    }
+  };
+
+  
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (password !== confirmPassword) {
       setError(language === "ar" ? "كلمة المرور وتأكيد كلمة المرور غير متطابقين." : "Password and confirm password do not match.");
       return;
     }
+    
 
     try {
-      let result;
-      if (isSignUp) {
-        result = await supabase.auth.signUp({
-          email,
-          password,
-        });
-      } else {
-        result = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-      }
+      const data = await registerUser({ email, password }); // Call your backend register API
+      setSuccess(
+        language === "ar"
+          ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
+          : "Signup successful! Check your email to confirm."
+      );
+      setIsSignUp(false); // Switch to login form after successful registration message
+      // Note: We don't automatically sign in here. The user needs to verify their email first.
 
-      const { error: authError, data } = result;
-
-      if (authError) {
-        setError(authError.message);
-      } else {
-        setSuccess(
-          isSignUp
-            ? language === "ar"
-              ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
-              : "Signup successful! Check your email to confirm."
-            : language === "ar"
-              ? "تم تسجيل الدخول بنجاح!"
-              : "Login successful!"
-        );
-        console.log("User:", data?.user);
-
-        if (!authError && data?.session) {
-          navigate('/admin'); 
-        }
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      setError(language === "ar" ? "حدث خطأ ما." : "Something went wrong.");
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      setError(
+        language === "ar"
+          ? `خطأ في التسجيل: ${error}`
+          : `Sign up error: ${error}`
+      );
     }
   };
+
 
   const authTexts = {
     en: {
@@ -165,7 +177,6 @@ const Auth = () => {
             <div className="rounded-md bg-green-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  {/* You can add a success icon here */}
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-green-800">{success}</p>
@@ -173,7 +184,7 @@ const Auth = () => {
               </div>
             </div>
           )}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={isSignUp ? handleSignUp : handleSignIn}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 {authTexts[language].emailAddress}
