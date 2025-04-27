@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
-import { registerUser, loginUser } from '@/lib/api'; // Assuming you created these API functions
+import { signIn, signUp } from 'supertokens-auth-react/recipe/emailpassword';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -39,27 +39,40 @@ const Auth = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+  
     try {
-      const data = await loginUser({ email, password }); // Call your backend login API
-      localStorage.setItem('authToken', data.token); // Store the token received from the backend
+      const response = await signIn({
+        formFields: [
+          { id: "email", value: email },
+          { id: "password", value: password }
+        ]
+      });
+  
+      if (response.status === "WRONG_CREDENTIALS_ERROR") {
+        throw new Error(
+          language === "ar" 
+            ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" 
+            : "Incorrect email or password"
+        );
+      }
+  
       setSuccess(
         language === "ar"
           ? "تم تسجيل الدخول بنجاح!"
           : "Login successful!"
       );
-
+  
       if (isAdmin) {
-        setAdminStatus(true); // You might need to handle admin status differently based on your backend response
+        setAdminStatus(true);
       }
-
+  
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       console.error("Sign in error:", error);
       setError(
         language === "ar"
-          ? `خطأ في تسجيل الدخول: ${error}`
-          : `Sign in error: ${error}`
+          ? `خطأ في تسجيل الدخول: ${error.message}`
+          : `Sign in error: ${error.message}`
       );
     }
   };
@@ -69,33 +82,52 @@ const Auth = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+  
     if (password !== confirmPassword) {
-      setError(language === "ar" ? "كلمة المرور وتأكيد كلمة المرور غير متطابقين." : "Password and confirm password do not match.");
+      setError(
+        language === "ar" 
+          ? "كلمة المرور وتأكيد كلمة المرور غير متطابقين." 
+          : "Password and confirm password do not match."
+      );
       return;
     }
-    
-
+  
     try {
-      const data = await registerUser({ email, password }); // Call your backend register API
+      const response = await signUp({
+        formFields: [
+          { id: "email", value: email },
+          { id: "password", value: password }
+        ]
+      });
+  
+      if (response.status === "FIELD_ERROR") {
+        response.formFields.forEach(field => {
+          if (field.id === "email") {
+            setError(
+              language === "ar" 
+                ? `خطأ في البريد الإلكتروني: ${field.error}` 
+                : `Email error: ${field.error}`
+            );
+          }
+        });
+        return;
+      }
+  
       setSuccess(
         language === "ar"
           ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
           : "Signup successful! Check your email to confirm."
       );
-      setIsSignUp(false); // Switch to login form after successful registration message
-      // Note: We don't automatically sign in here. The user needs to verify their email first.
-
-    } catch (error: any) {
+      setIsSignUp(false);
+    } catch (error) {
       console.error("Sign up error:", error);
       setError(
         language === "ar"
-          ? `خطأ في التسجيل: ${error}`
-          : `Sign up error: ${error}`
+          ? "حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى."
+          : "An error occurred during signup. Please try again."
       );
     }
   };
-
 
   const authTexts = {
     en: {

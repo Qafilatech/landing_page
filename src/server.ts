@@ -3,10 +3,9 @@ import cors from 'cors';
 import supertokens from 'supertokens-node';
 import Session from 'supertokens-node/recipe/session';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
-// import { middleware } from 'supertokens-node/framework/express';
-import { middleware } from 'supertokens-node/framework/express';
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
+import { middleware } from 'supertokens-node/lib/build/framework/express/framework';
 import { errorHandler } from './Middleware/errorHandler';
-
 
 export function initSuperTokens() {
   // Initialize SuperTokens
@@ -76,17 +75,23 @@ export function initSuperTokens() {
 
   // API routes
   app.get("/api/test", (req, res) => {
-    res.json({ message: "Hello from backend!" });
+    res.json({ message: "Backend Live" });
   });
 
-  // // Protected admin route example
-  // app.get("/api/admin", Session.verifySession(), async (req, res) => {
-  //   // Add your admin verification logic here
-  //   res.json({ message: "Admin access granted" });
-  // });
+  // Protected admin route example
+  app.get("/api/admin", verifySession(), async (req: any, res: any) => { // You might want to type req and res more specifically
+    // Access session information from req.session
+    if (req.session) {
+      console.log("Session information:", req.session);
+      // Add your admin verification logic based on session data (e.g., user roles)
+      res.json({ message: "Admin access granted", sessionInfo: req.session });
+    } else {
+      res.status(403).json({ message: "Unauthorized - No session found" });
+    }
+  });
 
-  // Error handling middleware (should be last)
-  // app.use(errorHandler);
+//   // Error handling middleware (should be last)
+//   app.use(errorHandler);
 
   // Start server
   const PORT = process.env.PORT || 8080;

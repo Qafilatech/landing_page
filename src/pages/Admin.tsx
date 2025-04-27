@@ -102,9 +102,9 @@ const Admin = () => {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  if (!session.doesSessionExist) {
-    return <Navigate to="/auth" />;
-  }
+  // if (!session.doesSessionExist) {
+  //   return <Navigate to="/auth" />;
+  // }
 
   // Here you should check if the user is an admin
   // This is a placeholder - implement your actual admin check
@@ -136,9 +136,9 @@ const Admin = () => {
       }
     };
     
-    if (session.doesSessionExist) {
-      verifyAdmin();
-    }
+    // if (session.doesSessionExist) {
+    //   verifyAdmin();
+    // }
   }, [session]);
 
   if (!isAdminUser) {
