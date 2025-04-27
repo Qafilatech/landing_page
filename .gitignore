@@ -1,1 +1,17 @@
 .DS_Store
+.env
+
+# Ignore everything by default
+*
+
+# Allowlist specific file extensions
+!package.json
+!package-lock.json
+!yarn.lock
+!tsconfig.json
+!.env*
+!public/
+!src/
+!README.md
+!LICENSE
+!.gitignore
