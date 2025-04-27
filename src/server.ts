@@ -5,8 +5,9 @@ import Session from 'supertokens-node/recipe/session';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { middleware } from 'supertokens-node/lib/build/framework/express/framework';
-import { errorHandler } from './Middleware/errorHandler';
+import { errorHandler
 
+ } from './Middleware/errorHandler';
 export function initSuperTokens() {
   // Initialize SuperTokens
   supertokens.init({
@@ -67,10 +68,15 @@ export function initSuperTokens() {
 
   app.use(express.json());
   app.use(middleware());
+  app.use(errorHandler);
 
   // Health check endpoint
-  app.get("/health", (_, res) => {
-    res.status(200).json({ status: "OK" });
+  app.get("/health", async (_, res, next) => {
+    try{
+        const result = await res.status(200).json({ status: "OK" });
+        res.json(result);
+    }catch (error: any) {
+        next(error);}
   });
 
   // API routes
