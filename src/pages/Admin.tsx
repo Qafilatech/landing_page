@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Navigate, Link } from 'react-router-dom';
-import { useLanguage } from '@/context/LanguageContext';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Truck, Package, BarChart, Settings, Users } from 'lucide-react';
 import Dashboard from './dashboardPages/Dashboard';
@@ -8,16 +8,18 @@ import DriversManagement from './dashboardPages/Drivers';
 import OrdersManagement from './dashboardPages/Orders';
 import SettingsManagement from './dashboardPages/Settings';
 import ActiveVehiclesManagement from './dashboardPages/Vehicles';
-
-const isAdmin = () => {
-  return localStorage.getItem('userRole') === 'admin';
-};
+import { useSessionContext } from "supertokens-auth-react/recipe/session";
 
 const Admin = () => {
   const { language, texts } = useLanguage();
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'drivers' | 'vehicles' |'orders' | 'settings'>('dashboard');
   const [dateRange, setDateRange] = useState('week');
+  const session = useSessionContext();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Check admin status (you'll need to implement this based on your backend)
+  const [isAdminUser, setIsAdminUser] = useState(false);
 
   const adminTexts = {
     en: {
@@ -53,7 +55,8 @@ const Admin = () => {
       comparedTo: 'compared to',
       yesterday: 'yesterday',
       lastWeek: 'last week',
-      vehicles: 'Vehicles'
+      vehicles: 'Vehicles',
+      unauthorized: 'Unauthorized access'
     },
     ar: {
       adminPanel: 'لوحة الإدارة',
@@ -89,9 +92,58 @@ const Admin = () => {
       yesterday: 'الأمس',
       lastWeek: 'الأسبوع الماضي',
       totalDeliveries: 'التوصيلات',
-      vehicles: 'المركبات'
+      vehicles: 'المركبات',
+      unauthorized: 'وصول غير مصرح به'
     }
   };
+
+  // Handle session and admin checks
+  if (session.loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (!session.doesSessionExist) {
+    return <Navigate to="/auth" />;
+  }
+
+  // Here you should check if the user is an admin
+  // This is a placeholder - implement your actual admin check
+  const checkAdminStatus = async () => {
+    try {
+      // Example: Make an API call to verify admin status
+      // const response = await fetch('/api/check-admin');
+      // const data = await response.json();
+      // return data.isAdmin;
+      return true; // Temporary for testing
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      return false;
+    }
+  };
+
+  // You might want to call checkAdminStatus in useEffect
+  React.useEffect(() => {
+    const verifyAdmin = async () => {
+      const isAdmin = await checkAdminStatus();
+      setIsAdminUser(isAdmin);
+      
+      if (!isAdmin) {
+        toast({
+          title: adminTexts[language].unauthorized,
+          variant: "destructive",
+        });
+        navigate("/");
+      }
+    };
+    
+    if (session.doesSessionExist) {
+      verifyAdmin();
+    }
+  }, [session]);
+
+  if (!isAdminUser) {
+    return <Navigate to="/" />;
+  }
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat(language === 'en' ? 'en-US' : 'ar-SA', {
@@ -124,10 +176,6 @@ const Admin = () => {
         return null;
     }  
   };
-
-  if (!isAdmin()) {
-    return <Navigate to="/" />;
-  }
 
   return (
     <div className={`min-h-screen bg-gray-100 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
