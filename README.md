@@ -23,11 +23,53 @@
 
 To start development:
 
-1. Make sure you have Node.js installed (v16 or higher recommended)
-2. Install dependencies: `npm install`
-3. Navigate to the project directory: `cd landing_page/src`
-4. Start development server: `npm run dev`
-5. Build for production: `npm run build`
+Frontend only 
+cd src/
+npm run dev       # Start Vite dev server
+npm run build     # Build frontend for production
+
+
+backend only 
+npm run dev:server    # Start backend with nodemon (development)
+npm run build:server  # Compile TypeScript
+npm run serve:server  # Run compiled backend
+
+to check backend respons 
+curl http://localhost:8080/health
+
+run togther 
+npm run dev:all    # Runs both frontend and backend dev servers
+
+## Project Structure
+
+```
+src/
+├── components/         # Reusable UI components
+│   ├── ui/            # shadcn/ui components
+│   ├── Button.tsx     # Custom button component
+│   ├── CTA.tsx        # Call-to-action component
+│   ├── Features.tsx   # Features section
+│   ├── Footer.tsx     # Footer component
+│   ├── Hero.tsx       # Hero section
+│   ├── HowItWorks.tsx # How it works section
+│   └── Navbar.tsx     # Navigation component
+├── pages/             # Page components
+│   ├── dashboardPages/ # Dashboard related pages
+│   ├── Admin.tsx      # Admin page
+│   ├── Auth.tsx       # Authentication page
+│   ├── Index.tsx      # Home page
+│   └── NotFound.tsx   # 404 page
+├── context/           # React Context providers
+├── hooks/             # Custom React hooks
+├── lib/               # Library configurations
+├── Middleware/        # Server middleware
+├── utils/             # Utility functions
+├── App.tsx            # Main App component
+├── main.tsx           # Application entry point
+├── server.ts          # Backend server
+├── index.css          # Global styles
+└── App.css            # App-specific styles
+```
 
 ## Contributing
 
@@ -36,17 +78,5 @@ To start development:
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin feature/my-new-feature`
 5. Submit a pull request
-
-### Explanation:
-- **`public/`**: Contains static files like `favicon.ico` and `robots.txt`.
-- **`src/`**: Contains all the source code for the application.
-  - **`assets/`**: Stores static assets like images and fonts.
-  - **`components/`**: Reusable UI components like buttons, cards, and inputs.
-  - **`layouts/`**: Layout components for structuring pages.
-  - **`pages/`**: Components for individual pages like Home, About, and Contact.
-  - **`services/`**: API and external service integrations.
-  - **`styles/`**: Global styles and theme configurations.
-  - **`utils/`**: Helper functions and constants.
-- **Root files**: Configuration files like `.eslintrc.json`, `.gitignore`, `package.json`, `tsconfig.json`, `vite.config.ts`, and `tailwind.config.js`.
 
 Made with 🤘🏿 by Halumi (with the help from The Moist Marauder)
