@@ -5,9 +5,27 @@ import Session from 'supertokens-node/recipe/session';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { middleware } from 'supertokens-node/lib/build/framework/express/framework';
-import { errorHandler
+import { errorHandler} from './Middleware/errorHandler';
+import { Pool } from 'pg';
+import * as dotenv from "dotenv"
 
- } from './Middleware/errorHandler';
+dotenv.config();
+console.log('testing',process.env.DATABASE_PASSWORD)
+
+const pool = new Pool({
+    user: process.env.DATABASE_USER,
+    host: process.env.DATABASE_HOST,
+    database: process.env.DATABASE_NAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: parseInt(process.env.DATABASE_PORT)
+});
+
+pool.connect()
+    .then(() => console.log('Connected to DB'))
+    .catch(err => console.log('Error Connecting', err));
+
+
+
 export function initSuperTokens() {
   // Initialize SuperTokens
   supertokens.init({

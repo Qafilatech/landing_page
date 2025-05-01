@@ -19,26 +19,24 @@
 - **State Management:** React Context
 - **Animations:** Tailwind CSS animations
 
-## Development
+# Development
+## Frontend (Vite + React)
+cd src/                  # Navigate to frontend directory
 
-To start development:
+- npm run dev              # Start Vite dev server
+- npm run build            # Build frontend for production
 
-Frontend only 
-cd src/
-npm run dev       # Start Vite dev server
-npm run build     # Build frontend for production
+## Backend (Node.js + TypeScript)
+- npm run dev:server       # Start backend with nodemon (development)
+- npm run build:server     # Compile backend TypeScript
+- npm run serve:server     # Run compiled backend
 
-
-backend only 
-npm run dev:server    # Start backend with nodemon (development)
-npm run build:server  # Compile TypeScript
-npm run serve:server  # Run compiled backend
-
-to check backend respons 
+## Check backend response in terminal 
 curl http://localhost:8080/health
 
-run togther 
-npm run dev:all    # Runs both frontend and backend dev servers
+
+## run togther 
+- npm run dev:all    # Runs both frontend and backend dev servers
 
 ## Project Structure
 
