@@ -13,16 +13,17 @@ dotenv.config();
 console.log('testing',process.env.DATABASE_PASSWORD)
 
 const pool = new Pool({
-    user: process.env.DATABASE_USER,
-    host: process.env.DATABASE_HOST,
-    database: process.env.DATABASE_NAME,
-    password: process.env.DATABASE_PASSWORD,
-    port: parseInt(process.env.DATABASE_PORT)
+    // user: process.env.DATABASE_USER,
+    // host: process.env.DATABASE_HOST,
+    // database: process.env.DATABASE_NAME,
+    // password: process.env.DATABASE_PASSWORD,
+    // port: parseInt(process.env.DATABASE_PORT)
+    connectionString: process.env.DATABASE_URL
 });
 
 pool.connect()
     .then(() => console.log('Connected to DB'))
-    .catch(err => console.log('Error Connecting', err));
+    .catch(err => console.log('Error Connecting to DB', err));
 
 
 
@@ -63,6 +64,31 @@ export function initSuperTokens() {
               },
             }
           ]
+        },
+        override: {
+          apis: (originalImplementation) => {
+            return {
+              ...originalImplementation,
+              signUpPOST: async (input) => {
+                const response = await originalImplementation.signUpPOST(input);
+                if (response.status === "OK") {
+                  try {
+                    // Store user in PG
+                    await pool.query(
+                      `INSERT INTO public."Users" (supertokens_id, email, created_at)
+                      VALUES ($1, $2, $3)
+                      ON CONFLICT (supertokens_id) DO NOTHING`,
+                      [response.user.id, response.user.emails[0], new Date()]
+                    );
+                    console.log(`User ${response.user.id} stored in DB`);
+                  } catch (err) {
+                    console.log(`User ${response.user.id} not stored in DB`, err);
+                  }
+                }
+                return response;
+              }
+            };
+          }
         }
       }),
       Session.init({
@@ -91,10 +117,18 @@ export function initSuperTokens() {
   // Health check endpoint
   app.get("/health", async (_, res, next) => {
     try{
-        const result = await res.status(200).json({ status: "OK" });
-        res.json(result);
+        // Test both SuperTokens and PostgreSQL connections
+       await pool.query('SELECT 1');
+       res.status(200).json({
+        status: "A OKAY",
+        database: "Connected"
+       });
     }catch (error: any) {
         next(error);}
+  });
+
+  app.get("/", (_, res) =>{
+    res.send("Welcome to QT, ya Cutei");
   });
 
   // API routes
@@ -103,12 +137,21 @@ export function initSuperTokens() {
   });
 
   // Protected admin route example
-  app.get("/api/admin", verifySession(), async (req: any, res: any) => { // You might want to type req and res more specifically
+  app.get("/api/admin", verifySession(), async (req: any, res: any) => {
     // Access session information from req.session
     if (req.session) {
-      console.log("Session information:", req.session);
-      // Add your admin verification logic based on session data (e.g., user roles)
-      res.json({ message: "Admin access granted", sessionInfo: req.session });
+      try {
+        const userData = await pool.query('SELECT * FROM public."Users" WHERE supertokens_id = $1');
+        
+        res.json({
+            message: "Admin access granted",
+            sessionInfo: req.session,
+            userData: userData.rows[0]
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ message: "Internal server error" });
+      }
     } else {
       res.status(403).json({ message: "Unauthorized - No session found" });
     }
