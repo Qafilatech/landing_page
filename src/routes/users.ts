@@ -1,30 +1,21 @@
 import express, { RequestHandler } from 'express'
 import bcrypt from 'bcrypt'
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
+import {pool}  from '../Authentication/auth' // or wherever you export the pool
+
 
 const router = express.Router();
 
-let users =[
-
-];
-
-router.get("/users", ((req, res) => {
-    res.json({users:users});
-    return;
-}) as RequestHandler);
-
-
-
-router.post("/users", ((req, res) => {
-    const newUser = req.body;
-
-    if (!newUser || typeof newUser !== 'object') {
-        res.status(400).json({ message: 'Invalid user data' });
-        return;
+router.get("/user", verifySession(), async(req,res) =>{
+    try{
+        const result = await pool.query('SELECT * FROM public."Users"');
+        res.json({users: result.rows});
+    } catch (error){
+        console.log('Error fetching users:', error);
+        res.status(500).json({message: "Internal server error"});
     }
+});
 
-    users.push(newUser);
-    res.status(201).json({message: 'User is Created!', newUser});
-    return;
-}) as RequestHandler);
+
 
 export default router
