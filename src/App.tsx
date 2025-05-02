@@ -8,68 +8,31 @@ import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
 import { SessionAuth, useSessionContext } from "supertokens-auth-react/recipe/session";
+import initializeAuth from "./pages/Auth"
+import {SuperTokensWrapper} from 'supertokens-auth-react'
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const session = useSessionContext();
-
-  if (session.loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!(session as any).doesSessionExist) {
-    return <Navigate to="/auth" />;
-  }
-
-  return <>{children}</>;
-};
-
-const AdminRoute = () => {
-  const session = useSessionContext();
-
-  if (session.loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!(session as any).doesSessionExist) {
-    return <Navigate to="/auth" />;
-  }
-
-  // In a real application, you would check user roles here
-  // You can access session.userId here if needed
-  const isAdmin = true; // Replace with actual admin check
-
-  if (!isAdmin) {
-    return <div>Unauthorized Access</div>;
-  }
-
-  return <Admin />;
-};
+initializeAuth();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <LanguageProvider>
-        <DefaultToaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/admin"
-              element={
-                <SessionAuth>
-                  <AdminRoute />
-                </SessionAuth>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </LanguageProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <SuperTokensWrapper>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <LanguageProvider>
+          <DefaultToaster />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin" element={<Admin/>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LanguageProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+    </SuperTokensWrapper>
 );
 
 export default App;
