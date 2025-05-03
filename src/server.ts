@@ -3,22 +3,33 @@ import express from 'express';
 import cors from 'cors';
 import { middleware } from 'supertokens-node/lib/build/framework/express/framework';
 import { errorHandler } from './Middleware/errorHandler';
-import { initializeAuth } from './Authentication/auth';
+import { initializeAuth } from './Authentication/authConfig';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import orderRouter from './routes/orders';
 import userRouter from './routes/users';
 import supertokens from 'supertokens-node';
-import {pool} from './Authentication/auth'
+import {pool} from './Authentication/authConfig'
 
-// Initialize SuperTokens
+
+// 1. ENVIRONMENT CHECKS ==============================================
+console.log('[BOOT] Environment Variables:', {
+    
+    API_DOMAIN: process.env.API_DOMAIN ,
+    WEBSITE_DOMAIN: process.env.WEBSITE_DOMAIN,
+    PORT: process.env.PORT,
+    DATABASE_URL: process.env.DATABASE_URL ? '***REDACTED***' : 'MISSING',
+    SUPERTOKENS_CONNECTION_URI: process.env.SUPERTOKENS_CONNECTION_URI || 'Using default'
+  });
+
+
+
+// 2. INITIALIZATION ==================================================
 initializeAuth();
 
 // Create Express app
 const app = express();
 
-
-
-// Middleware
+// 3. MIDDLEWARE PIPELINE (CRITICAL ORDER) ============================
 app.use(cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
@@ -26,31 +37,44 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(middleware()); // SuperTokens middleware
-app.use(errorHandler);
 app.use(express.urlencoded({ extended: true }));
+app.use(middleware()); // SuperTokens middleware
 
-// Health check endpoint this to be deleted later
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+});
+
+// Error handler should be after all routes and middleware
+app.use(errorHandler);
+
+// 4. ROUTES =========================================================
+// 4.1. Health Check (With DB verification)
 app.get("/health", async (_, res, next) => {
     try {
-        await pool.query('SELECT 1');
+        console.log('Attempting database connection...');
+        const result = await pool.query('SELECT 1');
+        console.log('Database connection successful');
         res.status(200).json({
             status: "A OKAY",
             database: "Connected"
         });
     } catch (error: any) {
+        console.error('Database connection error:', error);
         next(error);
     }
 });
 
-// Routes
-app.get("/", (_, res) => {
-    res.send("Welcome to QT, ya Cutei");
+
+app.get("/", (_, res) => {  // Changed from {_, res}
+  console.log('Request received at /');
+  res.send("Welcome to QT API");
 });
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "Backend Live" });
 });
+
 
 app.get("/api/admin", verifySession(), async (req: any, res: any) => {
     if (req.session) {
@@ -74,10 +98,19 @@ app.get("/api/admin", verifySession(), async (req: any, res: any) => {
 app.use('/api', orderRouter);
 app.use('/api', userRouter);
 
-// Start server
+// 5. SERVER START ===================================================
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(
+        `
+  ====================================================
+  🚀 Server running on http://localhost:${PORT}
+  ====================================================
+  Health Check:    http://localhost:${PORT}/health
+  SuperTokens:     http://localhost:${PORT}/auth/config
+  ====================================================
+  `
+    );
 });
 
 export { app };

@@ -1,7 +1,7 @@
 import express, { RequestHandler } from 'express'
 import bcrypt from 'bcrypt'
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
-import {pool}  from '../Authentication/auth' // or wherever you export the pool
+import {pool}  from '../Authentication/authConfig' // or wherever you export the pool
 
 
 const router = express.Router();
@@ -15,6 +15,7 @@ router.get("/user", verifySession(), async(req,res) =>{
         res.status(500).json({message: "Internal server error"});
     }
 });
+
 
 
 

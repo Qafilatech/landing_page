@@ -21,8 +21,8 @@ export function initializeAuth() {
         },
         appInfo: {
             appName: "QafilaTech",
-            apiDomain: process.env.API_DOMAIN || "http://localhost:8080",
-            websiteDomain: process.env.WEBSITE_DOMAIN || "http://localhost:3000",
+            apiDomain: process.env.API_DOMAIN,
+            websiteDomain: process.env.WEBSITE_DOMAIN,
             apiBasePath: "/auth",
             websiteBasePath: "/auth",
         },

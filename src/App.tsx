@@ -7,13 +7,12 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
-import { SessionAuth, useSessionContext } from "supertokens-auth-react/recipe/session";
-import initializeAuth from "./pages/Auth"
-import {SuperTokensWrapper} from 'supertokens-auth-react'
+import initializeAuth from "./pages/Auth";
+import { SuperTokensWrapper } from 'supertokens-auth-react';
 
 const queryClient = new QueryClient();
 
-initializeAuth();
+// initializeAuth();
 
 const App = () => (
   <SuperTokensWrapper>
@@ -32,7 +31,7 @@ const App = () => (
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
-    </SuperTokensWrapper>
+  </SuperTokensWrapper>
 );
 
 export default App;
