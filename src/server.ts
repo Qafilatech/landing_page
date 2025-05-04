@@ -3,7 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import { middleware } from 'supertokens-node/lib/build/framework/express/framework';
 import { errorHandler } from './Middleware/errorHandler';
-import { initializeAuth } from './Authentication/authConfig';
+// import { initializeAuth } from './Authentication/authConfig';
+import { backendConfig } from './Authentication/backendConfig';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import orderRouter from './routes/orders';
 import userRouter from './routes/users';
@@ -24,7 +25,13 @@ console.log('[BOOT] Environment Variables:', {
 
 
 // 2. INITIALIZATION ==================================================
-initializeAuth();
+// initializeAuth();
+supertokens.init(backendConfig());
+console.log(`
+     ====================================================
+     ||  SuperTokens initialized successfully  🚀 🚀 🚀 ||
+     ====================================================`);
+
 
 // Create Express app
 const app = express();
@@ -66,14 +73,10 @@ app.get("/health", async (_, res, next) => {
 });
 
 
-app.get("/", (_, res) => {  // Changed from {_, res}
-  console.log('Request received at /');
+app.get("/", (_, res) => {  
   res.send("Welcome to QT API");
 });
 
-app.get("/api/test", (req, res) => {
-    res.json({ message: "Backend Live" });
-});
 
 
 app.get("/api/admin", verifySession(), async (req: any, res: any) => {

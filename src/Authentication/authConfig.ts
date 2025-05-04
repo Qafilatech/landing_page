@@ -21,10 +21,10 @@ export function initializeAuth() {
         },
         appInfo: {
             appName: "QafilaTech",
-            apiDomain: process.env.API_DOMAIN,
-            websiteDomain: process.env.WEBSITE_DOMAIN,
+            apiDomain:  "http://localhost:8080",//process.env.API_DOMAIN,
+            websiteDomain:  "http://localhost:3000",//process.env.WEBSITE_DOMAIN,
             apiBasePath: "/auth",
-            websiteBasePath: "/auth",
+            websiteBasePath: "/",
         },
         recipeList: [
             EmailPassword.init({

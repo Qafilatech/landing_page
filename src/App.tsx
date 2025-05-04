@@ -8,14 +8,17 @@ import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
 import initializeAuth from "./pages/Auth";
-import { SuperTokensWrapper } from 'supertokens-auth-react';
+import { frontendConfig } from '../src/Authentication/frontendConfig'
+import supertokens from 'supertokens-node';
+import SuperTokens from 'supertokens-auth-react';
+
+SuperTokens.init(frontendConfig());
+console.log('SuperTokens frontend initialized successfully');
+
 
 const queryClient = new QueryClient();
 
-// initializeAuth();
-
 const App = () => (
-  <SuperTokensWrapper>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
@@ -31,7 +34,6 @@ const App = () => (
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
-  </SuperTokensWrapper>
 );
 
 export default App;
