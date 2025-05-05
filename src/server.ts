@@ -19,7 +19,8 @@ console.log('[BOOT] Environment Variables:', {
     WEBSITE_DOMAIN: process.env.WEBSITE_DOMAIN,
     PORT: process.env.PORT,
     DATABASE_URL: process.env.DATABASE_URL ? '***REDACTED***' : 'MISSING',
-    SUPERTOKENS_CONNECTION_URI: process.env.SUPERTOKENS_CONNECTION_URI || 'Using default'
+    SUPATOKSUPERTOKENS_CONNECTION_URIEN_URL: process.env.SUPATOKSUPERTOKENS_CONNECTION_URIEN_URL ? '***REDACTED***' : 'MISSING',
+    SUPATOKSUPERTOKENS_API: process.env.SUPATOKSUPERTOKENS_API ?  '***REDACTED***'  : 'MISSING'
   });
 
 
@@ -102,7 +103,7 @@ app.use('/api', orderRouter);
 app.use('/api', userRouter);
 
 // 5. SERVER START ===================================================
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
     console.log(
         `

@@ -7,6 +7,10 @@ import {pool}  from '../Authentication/authConfig' // or wherever you export the
 const router = express.Router();
 
 router.get("/user", verifySession(), async(req,res) =>{
+    res.status(200).json({
+        status: "A OKAY",
+        database: "Connected"
+    });
     try{
         const result = await pool.query('SELECT * FROM public."Users"');
         res.json({users: result.rows});
@@ -15,8 +19,6 @@ router.get("/user", verifySession(), async(req,res) =>{
         res.status(500).json({message: "Internal server error"});
     }
 });
-
-
 
 
 export default router
