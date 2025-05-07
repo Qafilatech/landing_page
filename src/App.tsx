@@ -7,32 +7,41 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
-import { SessionAuth, useSessionContext } from "supertokens-auth-react/recipe/session";
 import initializeAuth from "./pages/Auth"
-import {SuperTokensWrapper} from 'supertokens-auth-react'
+import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
+import { PreBuiltUIList, SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
+import { getSuperTokensRoutesForReactRouterDom } from "supertokens-auth-react/ui";
+import * as ReactRouter from "react-router-dom";
+import { SessionAuth } from "supertokens-auth-react/recipe/session";
+
+
+// Initialize SuperTokens - ideally in the global
+SuperTokens.init(SuperTokensConfig);
 
 const queryClient = new QueryClient();
 
-initializeAuth();
-
 const App = () => (
-  <SuperTokensWrapper>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <LanguageProvider>
-          <DefaultToaster />
-          <BrowserRouter>
+  <ComponentWrapper>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LanguageProvider>
+            <DefaultToaster/>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/admin" element={<Admin/>} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<Index/>}/>
+              <Route path="/test" element={<Auth/>}/>
+              {getSuperTokensRoutesForReactRouterDom(ReactRouter, PreBuiltUIList)}
+              <Route path="/admin" 
+                element={<SessionAuth>
+                  <Admin/>
+                </SessionAuth>}/>
+              <Route path="*" element={<NotFound/>}/>
             </Routes>
-          </BrowserRouter>
-        </LanguageProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-    </SuperTokensWrapper>
+          </LanguageProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </ComponentWrapper>
 );
 
 export default App;
