@@ -7,11 +7,8 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
-import initializeAuth from "./pages/Auth"
 import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
-import { PreBuiltUIList, SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
-import { getSuperTokensRoutesForReactRouterDom } from "supertokens-auth-react/ui";
-import * as ReactRouter from "react-router-dom";
+import {SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
 
 
@@ -21,27 +18,30 @@ SuperTokens.init(SuperTokensConfig);
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ComponentWrapper>
-    <BrowserRouter>
+  <SuperTokensWrapper>
+    <ComponentWrapper>
+      <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <LanguageProvider>
             <DefaultToaster/>
             <Routes>
               <Route path="/" element={<Index/>}/>
-              <Route path="/test" element={<Auth/>}/>
-              {getSuperTokensRoutesForReactRouterDom(ReactRouter, PreBuiltUIList)}
-              <Route path="/admin" 
-                element={<SessionAuth>
-                  <Admin/>
-                </SessionAuth>}/>
+              <Route path="/auth" element={<Auth/>}/>
+              <Route 
+              path="/admin" 
+              element={
+              <SessionAuth>
+                <Admin/>
+                </SessionAuth>} />
               <Route path="*" element={<NotFound/>}/>
             </Routes>
           </LanguageProvider>
         </TooltipProvider>
       </QueryClientProvider>
-    </BrowserRouter>
-  </ComponentWrapper>
+      </BrowserRouter>
+    </ComponentWrapper>
+  </SuperTokensWrapper>
 );
 
 export default App;

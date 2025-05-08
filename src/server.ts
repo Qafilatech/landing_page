@@ -19,7 +19,7 @@ const app = express();
 //Middleware
 app.use(
     cors({
-        origin: "*", //getWebsiteDomain(),
+        origin: getWebsiteDomain(),
         allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
         methods: ["GET", "PUT", "POST", "DELETE"],
         credentials: true,

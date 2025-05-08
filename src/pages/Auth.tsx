@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
 import { signIn, signUp } from 'supertokens-auth-react/recipe/emailpassword';
+import { text } from 'stream/consumers';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,12 +13,11 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { toast } = useToast();
   const { language, setLanguage, texts} = useLanguage();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
@@ -25,6 +25,8 @@ const Auth = () => {
     setPassword('');
     setConfirmPassword('');
     setAdminStatus(false);
+    setError("");
+    setSuccess("");
   };
 
   const togglePasswordVisibility = () => {
@@ -39,6 +41,7 @@ const Auth = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoading(true);
   
     try {
       const response = await signIn({
@@ -61,12 +64,7 @@ const Auth = () => {
           ? "تم تسجيل الدخول بنجاح!"
           : "Login successful!"
       );
-  
-      if (isAdmin) {
-        setAdminStatus(true);
-      }
-  
-      navigate('/');
+      navigate('/admin');
     } catch (error) {
       console.error("Sign in error:", error);
       setError(
@@ -75,6 +73,7 @@ const Auth = () => {
           : `Sign in error: ${error.message}`
       );
     }
+
   };
 
   
@@ -84,14 +83,12 @@ const Auth = () => {
     setSuccess("");
   
     if (password !== confirmPassword) {
-      setError(
-        language === "ar" 
-          ? "كلمة المرور وتأكيد كلمة المرور غير متطابقين." 
-          : "Password and confirm password do not match."
-      );
+      setError(authTexts[language].passwordMismatch);
+      setIsLoading(false);
       return;
     }
-  
+
+    setIsLoading(true);
     try {
       const response = await signUp({
         formFields: [
@@ -101,18 +98,24 @@ const Auth = () => {
       });
   
       if (response.status === "FIELD_ERROR") {
-        response.formFields.forEach(field => {
-          if (field.id === "email") {
-            setError(
-              language === "ar" 
-                ? `خطأ في البريد الإلكتروني: ${field.error}` 
-                : `Email error: ${field.error}`
-            );
-          }
-        });
+        // response.formFields.forEach(field => {
+        //   if (field.id === "email") {
+        //     setError(
+        //       language === "ar" 
+        //         ? `خطأ في البريد الإلكتروني: ${field.error}` 
+        //         : `Email error: ${field.error}`
+        //     );
+        //   }
+        // });
+        // return;
+
+        const emailError = response.formFields.find(f => f.id === "email")?.error;
+        const passwordError = response.formFields.find(f => f.id === "password")?.error;
+        setError(emailError || passwordError || texts.auth.signupError);
         return;
       }
-  
+      
+
       setSuccess(
         language === "ar"
           ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
@@ -121,11 +124,12 @@ const Auth = () => {
       setIsSignUp(false);
     } catch (error) {
       console.error("Sign up error:", error);
-      setError(
-        language === "ar"
-          ? "حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى."
-          : "An error occurred during signup. Please try again."
-      );
+      let errorMessage = authTexts[language].networkError;
+      if (error.message.includes("Failed to fetch")){
+        errorMessage = authTexts[language].networkError;
+      } else if (error.messages){
+        errorMessage = error.messages
+      }
     }
   };
 
@@ -147,7 +151,10 @@ const Auth = () => {
       platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.',
       adminAccess: 'Admin Access',
       adminCheckbox: 'Sign in as administrator',
-      adminNote: 'This is for demo purposes only'
+      adminNote: 'This is for demo purposes only',
+      passwordMismatch: 'Password and confirm password do not match',
+      networkError: "Network error - please check your connection",
+
     },
     ar: {
       createAccount: 'إنشاء حساب',
@@ -166,7 +173,10 @@ const Auth = () => {
       platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.',
       adminAccess: 'وصول المسؤول',
       adminCheckbox: 'تسجيل الدخول كمسؤول',
-      adminNote: 'هذا لأغراض العرض التوضيحي فقط'
+      adminNote: 'هذا لأغراض العرض التوضيحي فقط',
+      passwordMismatch: 'كلمة المرور وتأكيد كلمة المرور غير متطابقين.',
+      networkError: "خطأ في الشبكة - يرجى التحقق من اتصالك",
+
     }};
 
   return (
@@ -296,24 +306,7 @@ const Auth = () => {
                   />
                 </div>
               </div>
-            )}
-            <div className="flex items-center gap-2">
-              <input
-                id="adminAccess"
-                type="checkbox"
-                checked={isAdmin}
-                onChange={() => setIsAdmin(!isAdmin)}
-                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-              />
-              <div className="flex flex-col">
-                <label htmlFor="adminAccess" className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  <Shield className="h-4 w-4 text-amber-500" />
-                  {authTexts[language].adminCheckbox}
-                </label>
-                <p className="text-xs text-gray-500">{authTexts[language].adminNote}</p>
-              </div>
-            </div>
-
+            )}   
 
             <div>
               <button
