@@ -5,7 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
 import { signIn, signUp } from 'supertokens-auth-react/recipe/emailpassword';
-import { text } from 'stream/consumers';
+
+
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,6 +19,7 @@ const Auth = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
@@ -38,6 +40,7 @@ const Auth = () => {
   };
 
   const handleSignIn = async (e) => {
+    console.log("handleSignIn called"); 
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -78,6 +81,7 @@ const Auth = () => {
 
   
   const handleSignUp = async (e) => {
+    console.log("handleSignUp called"); 
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -89,6 +93,11 @@ const Auth = () => {
     }
 
     setIsLoading(true);
+    console.log("About to call signUp function"); 
+    fetch('http://localhost:8088/health')
+      .then(response => response.text())
+      .then(data => console.log('Health check from signup:', data))
+      .catch(error => console.error('Error during health check from signup:', error));
     try {
       const response = await signUp({
         formFields: [
@@ -96,6 +105,8 @@ const Auth = () => {
           { id: "password", value: password }
         ]
       });
+
+      console.log("info", response)
   
       if (response.status === "FIELD_ERROR") {
         // response.formFields.forEach(field => {
@@ -111,10 +122,11 @@ const Auth = () => {
 
         const emailError = response.formFields.find(f => f.id === "email")?.error;
         const passwordError = response.formFields.find(f => f.id === "password")?.error;
+        console.log('Password length:', password.length); // Debug log
         setError(emailError || passwordError || texts.auth.signupError);
+        console.log(emailError,passwordError)
         return;
       }
-      
 
       setSuccess(
         language === "ar"
