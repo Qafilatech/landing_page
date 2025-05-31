@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
+import ActivateAccount from "./pages/ActivateAccount"; // Import the new page
 import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
 import {SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
@@ -34,6 +35,7 @@ const App = () => (
               <SessionAuth>
                 <Admin/>
                 </SessionAuth>} />
+              <Route path="/activate-account" element={<ActivateAccount />} /> {/* Add new route */}
               <Route path="*" element={<NotFound/>}/>
             </Routes>
           </LanguageProvider>

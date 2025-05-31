@@ -28,8 +28,12 @@ export const SuperTokensConfig = {
     recipeList: [EmailPassword.init(), Session.init()],
     getRedirectionURL: async (context) => {
         if (context.action === "SUCCESS" && context.newSessionCreated) {
-            return "/";
+            // Redirect to admin page after successful login and new session creation
+            return "/admin";
         }
+        // It's good practice to return undefined or the default behavior if no custom redirection is needed for other cases.
+        // SuperTokens will handle default redirections if this function returns undefined for a particular context.
+        return undefined;
     },
 };
 
