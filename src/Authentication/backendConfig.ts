@@ -3,8 +3,48 @@ import EmailPassword from "supertokens-node/recipe/emailpassword";
 import Session from "supertokens-node/recipe/session";
 import { TypeInput } from "supertokens-node/types";
 import * as dotenv from "dotenv";
+import { Request } from 'express'; // Added for request type in getTenantIdFromURL
 
 dotenv.config();
+
+// Helper function to extract tenantId from URL
+const getTenantIdFromURL = (req: Request): string | undefined => {
+    // Expects URL like /api/<tenantId>/... or /<tenantId>/... if apiBasePath is just /
+    // Given apiBasePath will be /api, we expect /api/<tenantId>/...
+    const pathParts = req.originalUrl.split('/');
+    // Example for /api/customerA/users: ['', 'api', 'customerA', 'users']
+    // Example for /api/auth/signin: ['', 'api', 'auth', 'signin'] - 'auth' should not be a tenantId
+    if (pathParts.length > 2 && pathParts[1] === 'api') {
+        const potentialTenantId = pathParts[2];
+        // Add more sophisticated checks if needed, e.g., ensure it's not a reserved keyword like 'auth'
+        // or matches a pattern, or exists in a list of known tenants.
+        if (potentialTenantId && potentialTenantId !== 'auth') { // Ensure 'auth' or other global paths are not treated as tenants
+            console.log(`[MultiTenancy] Detected tenantId: ${potentialTenantId} from URL: ${req.originalUrl}`);
+            return potentialTenantId;
+        }
+    }
+    console.log(`[MultiTenancy] No tenantId detected or path is not tenant-specific for URL: ${req.originalUrl}`);
+    return undefined; // Default for non-tenant-specific paths or if pattern doesn't match
+};
+
+// Custom password validation function
+const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < 8) {
+        errors.push("Password must be at least 8 characters long.");
+    }
+    if (!/[0-9]/.test(password)) {
+        errors.push("Password must contain at least one number.");
+    }
+    if (!/[A-Z]/.test(password)) {
+        errors.push("Password must contain at least one uppercase letter.");
+    }
+    if (!/[a-z]/.test(password)) {
+        errors.push("Password must contain at least one lowercase letter.");
+    }
+    // console.log("[ValidatePassword] Errors:", errors); // For debugging
+    return errors;
+};
 
 // 1. ENVIRONMENT CHECKS ==============================================
 console.log('[BOOT] Backend Environment Variables:', {
@@ -34,27 +74,104 @@ export const SuperTokensConfig: TypeInput = {
       appName: "Qafila.Tech",
       apiDomain: getApiDomain(),
       websiteDomain: getWebsiteDomain(),
-      apiBasePath: "/",
+      apiBasePath: "/api", // Adjusted apiBasePath
       websiteBasePath: "/auth"
   },
   // recipeList contains all the modules that you want to
   // use from SuperTokens. See the full list here: https://supertokens.com/docs/guides
-  recipeList: [EmailPassword.init(), Session.init({
-    cookieDomain: "localhost",
-    sessionExpiredStatusCode: 401,
-    // errorHandlers: {
-    //   onUnauthorised: async (message, request, response) => {
-    //     // Your error handling
-    //     console.log("i dont know what im doing ")
-    //     console.log("message",message)
-    //     console.log("request",request)
-    //     console.log("response",response)
+  recipeList: [
+    EmailPassword.init({
+        override: {
+            emailPasswordFeature: {
+                getTenantId: async (context) => {
+                    // context.req is the Express Request object
+                    return getTenantIdFromURL(context.req as Request);
+                }
+            },
+            apis: (originalImplementation) => {
+                return {
+                    ...originalImplementation,
+                    signUpPOST: async function (input) {
+                        const passwordField = input.formFields.find(field => field.id === "password");
+                        if (passwordField) {
+                            const originalValidate = passwordField.validate;
+                            passwordField.validate = async (value) => {
+                                // First, run SuperTokens' original validation (if any) or basic checks
+                                const superTokensErrors = await originalValidate(value);
+                                if (superTokensErrors !== undefined && typeof superTokensErrors === 'string') {
+                                     // SuperTokens v13+ returns a string for error, or undefined for success
+                                    // To combine, we need to handle this. Let's prioritize our custom errors if SuperTokens' basic one passes.
+                                    // Or, if SuperTokens has an error, that should probably take precedence.
+                                    // For simplicity, if SuperTokens returns an error string, we return that.
+                                    // If it returns undefined (success), then we run our custom validation.
+                                    // This might need adjustment based on exact SuperTokens version behavior.
+                                    // Assuming string means error, undefined means ok from originalValidate.
+                                    return superTokensErrors;
+                                }
 
-    //   }}
-  })],
+                                const customErrors = validatePassword(value);
+                                if (customErrors.length > 0) {
+                                    return customErrors.join(" "); // Combine multiple errors into one string
+                                }
+                                return undefined; // No errors
+                            };
+                        }
+                        if (!originalImplementation.signUpPOST) {
+                            throw new Error("signUpPOST is not defined in originalImplementation");
+                        }
+                        return originalImplementation.signUpPOST(input);
+                    },
+                    passwordResetPOST: async function (input) {
+                        // The field ID for the new password in the reset flow is "newPassword" by default
+                        const passwordField = input.formFields.find(field => field.id === "newPassword");
+                        if (passwordField) {
+                            const originalValidate = passwordField.validate;
+                            passwordField.validate = async (value) => {
+                                const superTokensErrors = await originalValidate(value);
+                                 if (superTokensErrors !== undefined && typeof superTokensErrors === 'string') {
+                                    return superTokensErrors;
+                                }
+                                const customErrors = validatePassword(value);
+                                if (customErrors.length > 0) {
+                                    return customErrors.join(" ");
+                                }
+                                return undefined; // No errors
+                            };
+                        }
+                        if (!originalImplementation.passwordResetPOST) {
+                            throw new Error("passwordResetPOST is not defined in originalImplementation");
+                        }
+                        return originalImplementation.passwordResetPOST(input);
+                    }
+                };
+            }
+        }
+    }),
+    Session.init({
+        cookieDomain: "localhost",
+        sessionExpiredStatusCode: 401,
+        override: {
+            sessionFeature: {
+                getTenantId: async (context) => {
+                    // context.req is the Express Request object
+                    return getTenantIdFromURL(context.req as Request);
+                }
+            }
+        }
+        // errorHandlers: {
+        //   onUnauthorised: async (message, request, response) => {
+        //     // Your error handling
+        //     console.log("i dont know what im doing ")
+        //     console.log("message",message)
+        //     console.log("request",request)
+        //     console.log("response",response)
+
+        //   }}
+    })
+],
 };
 
-console.log("Backend is Live",SuperTokensConfig); 
+console.log("Backend is Live",SuperTokensConfig);
 
 
 

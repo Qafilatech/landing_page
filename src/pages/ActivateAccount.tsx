@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 
 // TODO: Import actual UI components e.g. from '../components/ui'
 // import { Input } from '../components/ui/input';
@@ -10,6 +10,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 const ActivateAccount: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { tenantId } = useParams<{ tenantId: string }>();
     // const { toast } = useToast(); // TODO: Uncomment when useToast is available
 
     const [token, setToken] = useState<string | null>(null);
@@ -24,14 +25,27 @@ const ActivateAccount: React.FC = () => {
             setToken(tokenFromUrl);
         } else {
             setMessage('Activation token not found in URL. Please check the link.');
-            // TODO: Show error toast
+            // TODO: Show error toast for missing token
             // toast({ title: 'Error', description: 'Activation token not found.', variant: 'destructive' });
         }
-    }, [searchParams /*, toast*/]); // TODO: Add toast to dependency array if used
+
+        if (!tenantId) {
+            setMessage('Tenant ID not found in URL. Please check the link.');
+            // TODO: Show error toast for missing tenantId
+            // toast({ title: 'Error', description: 'Tenant ID not found.', variant: 'destructive' });
+        }
+    }, [searchParams, tenantId /*, toast*/]); // TODO: Add toast to dependency array if used
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setMessage(null); // Clear previous messages
+
+        if (!tenantId) {
+            setMessage('Tenant ID is missing. Cannot proceed.');
+            // TODO: Show error toast
+            // toast({ title: 'Error', description: 'Tenant ID is missing.', variant: 'destructive' });
+            return;
+        }
 
         if (!token) {
             setMessage('No activation token available. Cannot proceed.');
@@ -57,7 +71,7 @@ const ActivateAccount: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/users/activate', {
+            const response = await fetch(`/api/${tenantId}/users/activate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,22 +82,23 @@ const ActivateAccount: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setMessage('Password set successfully! Redirecting to login...');
+                setMessage(`Password set successfully for ${tenantId}! Redirecting to login...`);
                 // TODO: Show success toast
-                // toast({ title: 'Success', description: 'Password set. Redirecting...' });
+                // toast({ title: 'Success', description: `Password set for ${tenantId}. Redirecting...` });
                 setTimeout(() => {
-                    navigate('/auth'); // Assuming '/auth' is your login route
+                    // TODO: Consider if login route should also be tenant-aware e.g. navigate(`/${tenantId}/auth`)
+                    navigate('/auth');
                 }, 3000);
             } else {
-                setMessage(data.message || 'An error occurred. Please try again.');
+                setMessage(data.message || `An error occurred for ${tenantId}. Please try again.`);
                 // TODO: Show error toast
-                // toast({ title: 'Error', description: data.message || 'Failed to set password.', variant: 'destructive' });
+                // toast({ title: 'Error', description: data.message || `Failed to set password for ${tenantId}.`, variant: 'destructive' });
             }
         } catch (error) {
-            console.error('Activation error:', error);
-            setMessage('An unexpected error occurred. Please check your connection or try again later.');
+            console.error(`Activation error for tenant ${tenantId}:`, error);
+            setMessage(`An unexpected error occurred for ${tenantId}. Please check your connection or try again later.`);
             // TODO: Show error toast
-            // toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+            // toast({ title: 'Error', description: `An unexpected error occurred for ${tenantId}.`, variant: 'destructive' });
         } finally {
             setIsLoading(false);
         }
@@ -91,9 +106,11 @@ const ActivateAccount: React.FC = () => {
 
     return (
         <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-            <h2>Activate Your Account</h2>
-            <p>Please set your password to activate your account.</p>
-            {token ? (
+            <h2>Activate Your Account {tenantId && `for ${tenantId}`}</h2>
+            {!tenantId && <p style={{color: 'red'}}>Tenant ID is missing from the URL.</p>}
+            {tenantId && <p>Please set your password to activate your account.</p>}
+
+            {token && tenantId ? (
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '15px' }}>
                         <label htmlFor="password">New Password:</label>
@@ -122,14 +139,18 @@ const ActivateAccount: React.FC = () => {
                     {/* TODO: Replace with <Button /> component */}
                     <button
                         type="submit"
-                        disabled={isLoading || !token}
-                        style={{ width: '100%', padding: '10px', backgroundColor: isLoading ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        disabled={isLoading || !token || !tenantId}
+                        style={{ width: '100%', padding: '10px', backgroundColor: (isLoading || !token || !tenantId) ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                     >
                         {isLoading ? 'Setting Password...' : 'Set Password'}
                     </button>
                 </form>
             ) : (
-                <p>Loading token or token is invalid...</p>
+                <p style={{color: 'red'}}>
+                    {!token && "Activation token is missing. "}
+                    {!tenantId && "Tenant ID is missing. "}
+                    Please check the activation link.
+                </p>
             )}
             {message && (
                 <p style={{ marginTop: '20px', color: message.startsWith('Password set successfully') ? 'green' : 'red' }}>

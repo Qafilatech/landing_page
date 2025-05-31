@@ -14,6 +14,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [tenantId, setTenantId] = useState(''); // Added tenantId state
   const { language, setLanguage, texts} = useLanguage();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -45,13 +46,25 @@ const Auth = () => {
     setError("");
     setSuccess("");
     setIsLoading(true);
+
+    if (!isSignUp && !tenantId) { // Check for tenantId only on sign-in
+      setError(language === "ar" ? "معرف الشركة مطلوب" : "Company ID is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!isSignUp) {
+      console.log("Attempting sign in for tenant:", tenantId); // Log tenantId
+    }
   
     try {
       const response = await signIn({
         formFields: [
           { id: "email", value: email },
           { id: "password", value: password }
-        ]
+        ],
+        userContext: { // Pass tenantId in userContext
+          tenantId: tenantId
+        }
       });
   
       if (response.status === "WRONG_CREDENTIALS_ERROR") {
@@ -261,6 +274,31 @@ const Auth = () => {
                 />
               </div>
             </div>
+
+            {!isSignUp && ( // Only show Tenant ID field on Sign In form
+              <div>
+                <label htmlFor="tenantId" className="block text-sm font-medium leading-6 text-gray-900">
+                  {authTexts[language].companyId || 'Company ID'} {/* Assuming you'll add companyId to authTexts */}
+                </label>
+                <div className="mt-2 relative">
+                  <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
+                    <Shield className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="tenantId"
+                    name="tenantId"
+                    type="text"
+                    autoComplete="organization"
+                    required
+                    value={tenantId}
+                    onChange={(e) => setTenantId(e.target.value)}
+                    className={`block w-full rounded-md border-0 py-2 ${language === 'ar' ? 'pr-10 pl-3 text-right' : 'pl-10 pr-3 text-left'} text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
+                    placeholder={language === 'en' ? "your-company-id" : "معرف-شركتك"}
+                    dir={language === 'ar' ? 'rtl' : 'ltr'}
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">

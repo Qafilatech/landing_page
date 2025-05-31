@@ -35,7 +35,7 @@ const App = () => (
               <SessionAuth>
                 <Admin/>
                 </SessionAuth>} />
-              <Route path="/activate-account" element={<ActivateAccount />} /> {/* Add new route */}
+              <Route path="/:tenantId/activate-account" element={<ActivateAccount />} /> {/* Updated route */}
               <Route path="*" element={<NotFound/>}/>
             </Routes>
           </LanguageProvider>
