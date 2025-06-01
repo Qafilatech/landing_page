@@ -70,12 +70,33 @@ export const SuperTokensConfig = {
         Session.init()
     ],
     getRedirectionURL: async (context) => {
-        if (context.action === "SUCCESS" && context.newSessionCreated) {
-            // Redirect to admin page after successful login and new session creation
-            return "/admin";
+        // Log the context to understand what's available, especially userContext
+        console.log("[getRedirectionURL] Context:", context);
+
+        if (context.action === "SUCCESS") { // newSessionCreated check can be here or removed if redirect always happens on SUCCESS
+            const tenantId = context.userContext?.tenantId as string | undefined;
+            console.log("[getRedirectionURL] UserContext tenantId:", tenantId);
+
+            if (tenantId) {
+                if (tenantId === "superadmin_tenant") {
+                    console.log("[getRedirectionURL] Redirecting to Super Admin Dashboard");
+                    return "/superadmin/dashboard";
+                } else {
+                    const redirectPath = `/${tenantId}/admin`;
+                    console.log(`[getRedirectionURL] Redirecting to tenant admin: ${redirectPath}`);
+                    return redirectPath;
+                }
+            } else {
+                // Fallback if tenantId is not in userContext for some reason after a successful login.
+                // This might indicate an issue with how userContext was passed or if the login flow
+                // somehow didn't include it.
+                console.warn("[getRedirectionURL] tenantId not found in userContext after successful login. Defaulting to /auth page.");
+                return "/auth?error=missing_tenant_context"; // Redirect to login with an error, or a generic error page
+            }
         }
-        // It's good practice to return undefined or the default behavior if no custom redirection is needed for other cases.
-        // SuperTokens will handle default redirections if this function returns undefined for a particular context.
+        // For other actions like "SIGN_IN_AND_UP", "GET_LOGIN_METHODS", etc., or if not SUCCESS:
+        // Return undefined to let SuperTokens handle its default redirection logic.
+        console.log(`[getRedirectionURL] Action: ${context.action}. No custom redirection defined, SuperTokens default will apply.`);
         return undefined;
     },
 };

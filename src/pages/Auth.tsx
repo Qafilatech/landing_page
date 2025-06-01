@@ -9,28 +9,18 @@ import { signIn, signUp } from 'supertokens-auth-react/recipe/emailpassword';
 
 
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [tenantId, setTenantId] = useState(''); // Added tenantId state
-  const { language, setLanguage, texts} = useLanguage();
+  // const [confirmPassword, setConfirmPassword] = useState(''); // Removed
+  const [tenantId, setTenantId] = useState('');
+  const { language, setLanguage, texts } = useLanguage();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
-  const toggleForm = () => {
-    setIsSignUp(!isSignUp);
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setAdminStatus(false);
-    setError("");
-    setSuccess("");
-  };
+  // toggleForm removed
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -47,14 +37,13 @@ const Auth = () => {
     setSuccess("");
     setIsLoading(true);
 
-    if (!isSignUp && !tenantId) { // Check for tenantId only on sign-in
+    // Tenant ID is always required for sign-in now
+    if (!tenantId) {
       setError(language === "ar" ? "معرف الشركة مطلوب" : "Company ID is required");
       setIsLoading(false);
       return;
     }
-    if (!isSignUp) {
-      console.log("Attempting sign in for tenant:", tenantId); // Log tenantId
-    }
+    console.log("Attempting sign in for tenant:", tenantId); // Log tenantId
   
     try {
       const response = await signIn({
@@ -92,116 +81,46 @@ const Auth = () => {
 
   };
 
-  
-  const handleSignUp = async (e) => {
-    console.log("handleSignUp called"); 
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-  
-    if (password !== confirmPassword) {
-      setError(authTexts[language].passwordMismatch);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    console.log("About to call signUp function"); 
-    fetch('http://localhost:8088/health')
-      .then(response => response.text())
-      .then(data => console.log('Health check from signup:', data))
-      .catch(error => console.error('Error during health check from signup:', error));
-    try {
-      const response = await signUp({
-        formFields: [
-          { id: "email", value: email },
-          { id: "password", value: password }
-        ]
-      });
-
-      console.log("info", response)
-  
-      if (response.status === "FIELD_ERROR") {
-        // response.formFields.forEach(field => {
-        //   if (field.id === "email") {
-        //     setError(
-        //       language === "ar" 
-        //         ? `خطأ في البريد الإلكتروني: ${field.error}` 
-        //         : `Email error: ${field.error}`
-        //     );
-        //   }
-        // });
-        // return;
-
-        const emailError = response.formFields.find(f => f.id === "email")?.error;
-        const passwordError = response.formFields.find(f => f.id === "password")?.error;
-        console.log('Password length:', password.length); // Debug log
-        setError(emailError || passwordError || texts.auth.signupError);
-        console.log(emailError,passwordError)
-        return;
-      }
-
-      setSuccess(
-        language === "ar"
-          ? "تم التسجيل بنجاح! تحقق من بريدك الإلكتروني للتأكيد."
-          : "Signup successful! Check your email to confirm."
-      );
-      setIsSignUp(false);
-    } catch (error) {
-      console.error("Sign up error:", error);
-      let errorMessage = authTexts[language].networkError;
-      if (error.message.includes("Failed to fetch")){
-        errorMessage = authTexts[language].networkError;
-      } else if (error.messages){
-        errorMessage = error.messages
-      }
-    }
-  };
+  // handleSignUp function removed
 
   const authTexts = {
     en: {
-      createAccount: 'Create an account',
+      // createAccount: 'Create an account', // Removed
       signIn: 'Sign in to your account',
       emailAddress: 'Email address',
       password: 'Password',
-      confirmPassword: 'Confirm Password',
-      signUpButton: 'Sign up',
+      // confirmPassword: 'Confirm Password', // Removed
+      // signUpButton: 'Sign up', // Removed
       signInButton: 'Sign in',
-      alreadyHaveAccount: 'Already have an account?',
-      dontHaveAccount: 'Don\'t have an account?',
-      createOne: 'Create one',
-      switchToSignIn: 'Sign in',
+      // alreadyHaveAccount: 'Already have an account?', // Removed
+      // dontHaveAccount: 'Don\'t have an account?', // Removed
+      // createOne: 'Create one', // Removed
+      // switchToSignIn: 'Sign in', // Removed
       changeLanguage: 'AR',
       joinPlatform: 'Join Our Platform',
       platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.',
-      adminAccess: 'Admin Access',
-      adminCheckbox: 'Sign in as administrator',
-      adminNote: 'This is for demo purposes only',
-      passwordMismatch: 'Password and confirm password do not match',
+      // passwordMismatch: 'Password and confirm password do not match', // Removed
       networkError: "Network error - please check your connection",
-
+      companyId: 'Company ID',
     },
     ar: {
-      createAccount: 'إنشاء حساب',
+      // createAccount: 'إنشاء حساب', // Removed
       signIn: 'تسجيل الدخول إلى حسابك',
       emailAddress: 'عنوان البريد الإلكتروني',
       password: 'كلمة المرور',
-      confirmPassword: 'تأكيد كلمة المرور',
-      signUpButton: 'إنشاء حساب',
+      // confirmPassword: 'تأكيد كلمة المرور', // Removed
+      // signUpButton: 'إنشاء حساب', // Removed
       signInButton: 'تسجيل الدخول',
-      alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
-      dontHaveAccount: 'ليس لديك حساب؟',
-      createOne: 'إنشاء حساب',
-      switchToSignIn: 'تسجيل الدخول',
+      // alreadyHaveAccount: 'هل لديك حساب بالفعل؟', // Removed
+      // dontHaveAccount: 'ليس لديك حساب؟', // Removed
+      // createOne: 'إنشاء حساب', // Removed
+      // switchToSignIn: 'تسجيل الدخول', // Removed
       changeLanguage: 'EN',
       joinPlatform: 'انضم إلى منصتنا',
       platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.',
-      adminAccess: 'وصول المسؤول',
-      adminCheckbox: 'تسجيل الدخول كمسؤول',
-      adminNote: 'هذا لأغراض العرض التوضيحي فقط',
-      passwordMismatch: 'كلمة المرور وتأكيد كلمة المرور غير متطابقين.',
+      // passwordMismatch: 'كلمة المرور وتأكيد كلمة المرور غير متطابقين.', // Removed
       networkError: "خطأ في الشبكة - يرجى التحقق من اتصالك",
-
+      companyId: 'معرف الشركة',
     }};
 
   return (
@@ -223,7 +142,7 @@ const Auth = () => {
 
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            {isSignUp ? authTexts[language].createAccount : authTexts[language].signIn}
+            {authTexts[language].signIn}
           </h2>
         </div>
 
@@ -251,7 +170,7 @@ const Auth = () => {
               </div>
             </div>
           )}
-          <form className="space-y-6" onSubmit={isSignUp ? handleSignUp : handleSignIn}>
+          <form className="space-y-6" onSubmit={handleSignIn}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 {authTexts[language].emailAddress}
@@ -275,10 +194,10 @@ const Auth = () => {
               </div>
             </div>
 
-            {!isSignUp && ( // Only show Tenant ID field on Sign In form
-              <div>
-                <label htmlFor="tenantId" className="block text-sm font-medium leading-6 text-gray-900">
-                  {authTexts[language].companyId || 'Company ID'} {/* Assuming you'll add companyId to authTexts */}
+            {/* Tenant ID field is now always part of the form */}
+            <div>
+              <label htmlFor="tenantId" className="block text-sm font-medium leading-6 text-gray-900">
+                {authTexts[language].companyId || 'Company ID'}
                 </label>
                 <div className="mt-2 relative">
                   <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
@@ -289,7 +208,7 @@ const Auth = () => {
                     name="tenantId"
                     type="text"
                     autoComplete="organization"
-                    required
+                    required // Always required
                     value={tenantId}
                     onChange={(e) => setTenantId(e.target.value)}
                     className={`block w-full rounded-md border-0 py-2 ${language === 'ar' ? 'pr-10 pl-3 text-right' : 'pl-10 pr-3 text-left'} text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
@@ -298,7 +217,6 @@ const Auth = () => {
                   />
                 </div>
               </div>
-            )}
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
@@ -312,7 +230,7 @@ const Auth = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                    autoComplete="current-password" // Now always current-password
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -334,48 +252,18 @@ const Auth = () => {
               </div>
             </div>
 
-            {isSignUp && (
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
-                  {authTexts[language].confirmPassword}
-                </label>
-                <div className="mt-2 relative">
-                <div className={`absolute inset-y-0 ${language === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
-                <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`block w-full rounded-md border-0 py-2 ${language === 'ar' ? 'pr-10 pl-10 text-right' : 'pl-10 pr-10 text-left'} text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                    placeholder="••••••••"
-                    dir={language === 'ar' ? 'rtl' : 'ltr'}
-                  />
-                </div>
-              </div>
-            )}   
+            {/* Confirm password field removed */}
 
             <div>
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-                {isSignUp ? authTexts[language].signUpButton : authTexts[language].signInButton}
+                {authTexts[language].signInButton}
               </button>
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-          {isSignUp ? authTexts[language].alreadyHaveAccount : authTexts[language].dontHaveAccount}
-          <button
-              onClick={toggleForm}
-              className="font-semibold leading-6 text-primary hover:text-primary/80 mr-1 ml-1"
-            >
-              {isSignUp ? authTexts[language].switchToSignIn : authTexts[language].createOne}
-              </button>
-          </p>
+          {/* Toggle link removed */}
         </div>
       </div>
 

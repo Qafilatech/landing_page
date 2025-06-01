@@ -7,7 +7,9 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
-import ActivateAccount from "./pages/ActivateAccount"; // Import the new page
+import ActivateAccount from "./pages/ActivateAccount";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard"; // Import SuperAdminDashboard
 import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
 import {SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
@@ -35,7 +37,9 @@ const App = () => (
               <SessionAuth>
                 <Admin/>
                 </SessionAuth>} />
-              <Route path="/:tenantId/activate-account" element={<ActivateAccount />} /> {/* Updated route */}
+              <Route path="/:tenantId/activate-account" element={<ActivateAccount />} />
+              <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+              <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} /> {/* Super Admin Dashboard Route */}
               <Route path="*" element={<NotFound/>}/>
             </Routes>
           </LanguageProvider>
