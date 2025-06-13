@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 // import EmailPassword from 'supertokens-node/recipe/emailpassword'; // Not directly needed for this route unless creating users here
 // import { User } from '../models/user'; // Example user model
-// import pool from '../db'; // Placeholder for DB client
+import pool from '../db'; // Placeholder for DB client
 // import axios from 'axios'; // Placeholder for HTTP client to call SuperTokens core
 
 const router: Router = Router();
@@ -50,22 +50,52 @@ router.post('/companies/create', verifySession(), async (req: Request, res: Resp
         // );
         // const newCompany = dbResult.rows[0];
         // console.log("[SuperAdmin] Company saved to DB:", newCompany);
+
+        const dbConn = await pool.query(
+            `INSERT INTO "Businesses" 
+            ( company_name, company_address, company_cr, supertokens_tenant_id) 
+            VALUES ($1, $2, $3, $4) RETURNING *`,
+            [ companyName, details.address, details.crNumber, desiredTenantId]
+        )
+        const newCompany = dbConn.rows[0];
+        console.log("[SuperAdmin] Company saved to DB:", newCompany);
         const newCompanyPlaceholder = { id: Date.now(), company_name: companyName, supertokens_tenant_id: desiredTenantId, other_details: details, created_at: new Date() };
 
 
         // Step 2: Create Tenant in SuperTokens Core (Placeholder)
         console.log(`[SuperAdmin] Attempting to create SuperTokens tenant '${desiredTenantId}'...`);
         // TODO: Implement HTTP call to SuperTokens core API to create tenant.
-        // const supertokensCoreUrl = process.env.SUPERTOKENS_CORE_URI || 'http://localhost:3567'; // Ensure this is configured
-        // const supertokensApiKey = process.env.SUPERTOKENS_CORE_API_KEY; // Ensure this is configured
-        // const tenantConfig = {
-        //     tenantId: desiredTenantId,
-        //     emailPassword: { enabled: true }, // Configure features for the new tenant
-        //     thirdParty: { enabled: false },
-        //     passwordless: { enabled: false },
-        //     session: { enabled: true } // Assuming session recipe is used by tenants
-        //     // Add other recipe configs as needed
-        // };
+        const supertokensCoreUrl = process.env.REACT_APP_SUPERTOKENS_CONNECTION_URI || 'http://localhost:3567'; 
+        const supertokensApiKey = process.env.REACT_APP_SUPERTOKENS_API_KEY; 
+        const tenantConfig = {
+            tenantId: desiredTenantId,
+            emailPassword: { enabled: true }, // Configure features for the new tenant
+            thirdParty: { enabled: false },
+            passwordless: { enabled: false },
+            session: { 
+                enabled: true,
+                settings:{
+                    // Session lifetime settings
+                    accessTokenValidity: 86400,  // 1 day in seconds
+                    refreshTokenValidity: 1209600,  // 14 days in seconds
+                    // Domain and cookie settings
+                    cookieSameSite: "lax",
+                    //TODO: convert to production when launching 
+                    cookieSecure: process.env.NODE_ENV === "development",
+                    domain: "qafila.tech"
+                } 
+            },
+            userRoles: {
+                enabled: true,
+                // Default roles for new users in this tenant
+                defaultRoles: ["business-admin"]
+            },
+            permissionClaims: {
+                enabled: true
+            }
+             // Assuming session recipe is used by tenants
+            // Add other recipe configs as needed
+        };
         // try {
         //     // Use appropriate HTTP client, e.g., axios or node-fetch
         //     // await axios.put(`${supertokensCoreUrl}/ee/tenant`, tenantConfig, {
