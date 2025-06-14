@@ -1,5 +1,6 @@
 import EmailPassword from "supertokens-node/recipe/emailpassword";
 import Session from "supertokens-node/recipe/session";
+import AccountLinking from "supertokens-node/recipe/accountlinking";
 import { TypeInput } from "supertokens-node/types";
 import * as dotenv from "dotenv";
 import { Request } from 'express'; // Added for request type in getTenantIdFromURL
@@ -7,23 +8,29 @@ import { Request } from 'express'; // Added for request type in getTenantIdFromU
 dotenv.config();
 
 // Helper function to extract tenantId from URL
-const getTenantIdFromURL = (req: Request): string | undefined => {
-    // Expects URL like /api/<tenantId>/... or /<tenantId>/... if apiBasePath is just /
-    // Given apiBasePath will be /api, we expect /api/<tenantId>/...
+const getTenantIdFromRequest = (req: Request): string | undefined => {
+    // 1. Check URL
     const pathParts = req.originalUrl.split('/');
-    // Example for /api/customerA/users: ['', 'api', 'customerA', 'users']
-    // Example for /api/auth/signin: ['', 'api', 'auth', 'signin'] - 'auth' should not be a tenantId
     if (pathParts.length > 2 && pathParts[1] === 'api') {
         const potentialTenantId = pathParts[2];
-        // Add more sophisticated checks if needed, e.g., ensure it's not a reserved keyword like 'auth'
-        // or matches a pattern, or exists in a list of known tenants.
-        if (potentialTenantId && potentialTenantId !== 'auth') { // Ensure 'auth' or other global paths are not treated as tenants
-            console.log(`[MultiTenancy] Detected tenantId: ${potentialTenantId} from URL: ${req.originalUrl}`);
+        if (potentialTenantId && potentialTenantId !== 'auth') {
+            console.log(`[TenantCheck] Found in URL: ${potentialTenantId}`);
             return potentialTenantId;
         }
     }
-    console.log(`[MultiTenancy] No tenantId detected or path is not tenant-specific for URL: ${req.originalUrl}`);
-    return undefined; // Default for non-tenant-specific paths or if pattern doesn't match
+    // 2. Check body (for signIn/signUp)
+    console.log("[TenantCheck] req.body:", req.body);
+    if (req.body?.userContext?.tenantId) {
+        console.log(`[TenantCheck] Found in body: ${req.body.userContext.tenantId}`);
+        return req.body.userContext.tenantId;
+    }
+    // 3. Check header (optional)
+    if (req.headers['x-tenant-id']) {
+        console.log(`[TenantCheck] Found in header: ${req.headers['x-tenant-id']}`);
+        return req.headers['x-tenant-id'] as string;
+    }
+    console.log("[TenantCheck] No tenantId found, defaulting to undefined");
+    return undefined;
 };
 
 // Custom password validation function
@@ -85,7 +92,7 @@ export const SuperTokensConfig: TypeInput = {
                 return {
                     ...originalImplementation,
                     getTenantId: async (context) => {
-                        return getTenantIdFromURL(context.req as Request);
+                        return getTenantIdFromRequest(context.req as Request);
                     }
                 };
             },
@@ -123,23 +130,31 @@ export const SuperTokensConfig: TypeInput = {
         }
     }),
     Session.init({
-        cookieDomain: "localhost",
+        cookieDomain: process.env.NODE_ENV === "production" ? "qafila.tech" : "localhost",
+        cookieSameSite: "lax",
+        cookieSecure: process.env.NODE_ENV === "production",
         sessionExpiredStatusCode: 401,
         override: {
             functions: (originalImplementation) => {
                 return {
                     ...originalImplementation,
                     getTenantId: async (context) => {
-                        return getTenantIdFromURL(context.req as Request);
+                        return getTenantIdFromRequest(context.req as Request);
                     }
                 };
             }
         }
+    }),
+    AccountLinking.init({
+      shouldDoAutomaticAccountLinking: async () => {
+        // Disable automatic account linking
+        return { shouldAutomaticallyLink: false };
+      }
     })
 ],
 };
 
-console.log("Backend is Live",SuperTokensConfig);
+console.log("Backend is Live");
 
 
 

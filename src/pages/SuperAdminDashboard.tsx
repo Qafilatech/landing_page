@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { SessionAuth, useSessionContext } from 'supertokens-auth-react/recipe/session';
 import { signOut } from 'supertokens-auth-react/recipe/emailpassword';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,26 @@ const SuperAdminDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Log session state for debugging
+        console.log("Dashboard Session Context:", {
+            loading: sessionContext.loading,
+            sessionExists: !sessionContext.loading && 'userId' in sessionContext,
+            userId: !sessionContext.loading && 'userId' in sessionContext ? sessionContext.userId : null,
+            accessTokenPayload: !sessionContext.loading && 'accessTokenPayload' in sessionContext ? sessionContext.accessTokenPayload : null
+        });
+
+        // If we have a session, verify it's for the superadmin tenant
+        if (!sessionContext.loading && 'userId' in sessionContext) {
+            const tenantId = sessionContext.accessTokenPayload?.tenantId;
+            console.log("Current tenant ID:", tenantId);
+            if (tenantId !== "superadmin_tenant") {
+                console.log("Not a superadmin session, redirecting to login");
+                navigate('/superadmin/login');
+            }
+        }
+    }, [sessionContext, navigate]);
 
     const handleRegisterCompany = async (e: FormEvent) => {
         e.preventDefault();
@@ -100,30 +120,25 @@ const SuperAdminDashboard: React.FC = () => {
         navigate('/superadmin/login'); // Or your desired logout destination
     };
 
-    // TODO TARIQ DESIGN
     // Handle session loading state
     if (sessionContext.loading) {
+        console.log("Session is still loading...");
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                Loading Super Admin Dashboard...
+                <div>
+                    <h2>Loading Super Admin Dashboard...</h2>
+                    <p>Please wait while we verify your session.</p>
+                </div>
             </div>
         );
     }
 
-    //TODO 
-    // Redirect if not authenticated (though SessionAuth should handle this, this is an explicit check)
-    // Note: This check might be redundant if SessionAuth's default behavior is to redirect.
-    // However, it can be useful if you need custom logic before redirection or if you're not using onUnauthorised in Session.init.
-    if (!sessionContext.doesSessionExist) {
-        // This part might not be reached if SessionAuth redirects first.
-        // Consider if a redirect component or hook is more idiomatic with your SessionAuth setup.
-        // For now, logging it. SuperTokens might redirect to loginPath from Session.init if configured.
-        console.log("No session exists, redirecting (this might be handled by SessionAuth).");
-        // navigate might not work here if SessionAuth is already redirecting.
-        // SuperTokens.redirectToAuth({ redirectBack: false }); // Alternative way to redirect
-        return <p>Redirecting to login...</p>;
+    // Redirect if not authenticated
+    if (!('userId' in sessionContext)) {
+        console.log("No session exists, redirecting to login...");
+        navigate('/superadmin/login');
+        return null;
     }
-
 
     return (
         <SessionAuth> {/* Ensures this component is only rendered if a session exists for the superadmin_tenant */}

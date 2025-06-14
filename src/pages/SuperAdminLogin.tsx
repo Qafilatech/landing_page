@@ -1,6 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signIn } from 'supertokens-auth-react/recipe/emailpassword';
+import Session from "supertokens-auth-react/recipe/session";
 
 // TODO: Import actual UI components if available (Input, Button, etc.)
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,7 @@ const SuperAdminLogin: React.FC = () => {
         setIsLoading(true);
 
         try {
+            console.log("[DEBUG] About to call signIn", { email, password, tenantId: superAdminTenantId });
             const response = await signIn({
                 formFields: [
                     { id: "email", value: email },
@@ -33,24 +35,30 @@ const SuperAdminLogin: React.FC = () => {
                     tenantId: superAdminTenantId
                 }
             });
+            console.log("[DEBUG] signIn call resolved", response);
 
-            if (response.status === "OK") {
+            const payload = await Session.getAccessTokenPayloadSecurely();
+            const tenantId = payload?.tId;
 
+            if (tenantId === "superadmin_tenant") {
+                console.log("Login successful, session created");
                 toast({ title: 'Success', description: 'Super admin login successful.' });
-                navigate('/superadmin/dashboard'); // Navigate to a placeholder super admin dashboard
+                console.log("Navigating to dashboard...");
+                navigate('/superadmin/dashboard');
             } else if (response.status === "WRONG_CREDENTIALS_ERROR") {
+                console.log("Login failed: Wrong credentials");
                 setError("Incorrect email or password.");
                 toast({ title: 'Error', description: 'Incorrect email or password.', variant: 'destructive' });
             } else {
-                // Handle other errors like "SIGN_IN_NOT_ALLOWED", etc.
+                console.log("Login failed with status:", response.status);
                 setError("An unexpected error occurred. Please try again.");
                 toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
                 console.error("Super admin sign in error:", response);
             }
         } catch (err: any) {
+            console.error("[DEBUG] signIn threw an exception:", err, JSON.stringify(err));
             setError(err.message || "An unexpected error occurred during login.");
             toast({ title: 'Error', description: err.message || 'Login failed.', variant: 'destructive' });
-            console.error("Super admin sign in exception:", err);
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +75,7 @@ const SuperAdminLogin: React.FC = () => {
                     >
                         Email:
                     </label>
-                    <Input
+                    <input
                         id="email"
                         type="email"
                         value={email}
@@ -84,7 +92,7 @@ const SuperAdminLogin: React.FC = () => {
                     >
                         Password:
                     </label>
-                    <Input
+                    <input
                         id="password"
                         type="password"
                         value={password}
@@ -99,7 +107,7 @@ const SuperAdminLogin: React.FC = () => {
                         {error}
                     </p>
                 )}
-                <Button
+                <button
                     type="submit"
                     disabled={isLoading}
                     style={{
@@ -115,7 +123,7 @@ const SuperAdminLogin: React.FC = () => {
                     }}
                 >
                     {isLoading ? 'Logging in...' : 'Login'}
-                </Button>
+                </button>
             </form>
         </div>
     );

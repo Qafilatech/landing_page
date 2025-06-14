@@ -49,7 +49,13 @@ export const SuperTokensConfig = {
                 }
             }
         }),
-        Session.init()
+        Session.init({
+            onHandleEvent: async (context) => {
+                if (context.action === "SESSION_CREATED") {
+                    console.log("Session created successfully");
+                }
+            }
+        })
     ],
     getRedirectionURL: async (context) => {
         // Log the context to understand what's available, especially userContext
