@@ -1,4 +1,3 @@
-
 import EmailPassword from "supertokens-node/recipe/emailpassword";
 import Session from "supertokens-node/recipe/session";
 import { TypeInput } from "supertokens-node/types";
@@ -52,7 +51,7 @@ console.log('[BOOT] Backend Environment Variables:', {
   // DATABASE_URL: process.env.DATABASE_URL, // ? '***REDACTED***' : 'MISSING',
   REACT_APP_SUPERTOKENS_CONNECTION_URI: process.env.REACT_APP_SUPERTOKENS_CONNECTION_URI ,//? '***REDACTED***' : 'MISSING',
   REACT_APP_SUPERTOKENS_API_KEY: process.env.REACT_APP_SUPERTOKENS_API_KEY  ,//?  '***REDACTED***'  : 'MISSING',
-  API_URL: process.env.API_URL
+  API_URL: process.env.REACT_APP_API_URL
 });
 
 
@@ -82,11 +81,13 @@ export const SuperTokensConfig: TypeInput = {
   recipeList: [
     EmailPassword.init({
         override: {
-            emailPasswordFeature: {
-                getTenantId: async (context) => {
-                    // context.req is the Express Request object
-                    return getTenantIdFromURL(context.req as Request);
-                }
+            functions: (originalImplementation) => {
+                return {
+                    ...originalImplementation,
+                    getTenantId: async (context) => {
+                        return getTenantIdFromURL(context.req as Request);
+                    }
+                };
             },
             apis: (originalImplementation) => {
                 return {
@@ -94,52 +95,26 @@ export const SuperTokensConfig: TypeInput = {
                     signUpPOST: async function (input) {
                         const passwordField = input.formFields.find(field => field.id === "password");
                         if (passwordField) {
-                            const originalValidate = passwordField.validate;
-                            passwordField.validate = async (value) => {
-                                // First, run SuperTokens' original validation (if any) or basic checks
-                                const superTokensErrors = await originalValidate(value);
-                                if (superTokensErrors !== undefined && typeof superTokensErrors === 'string') {
-                                     // SuperTokens v13+ returns a string for error, or undefined for success
-                                    // To combine, we need to handle this. Let's prioritize our custom errors if SuperTokens' basic one passes.
-                                    // Or, if SuperTokens has an error, that should probably take precedence.
-                                    // For simplicity, if SuperTokens returns an error string, we return that.
-                                    // If it returns undefined (success), then we run our custom validation.
-                                    // This might need adjustment based on exact SuperTokens version behavior.
-                                    // Assuming string means error, undefined means ok from originalValidate.
-                                    return superTokensErrors;
-                                }
-
-                                const customErrors = validatePassword(value);
-                                if (customErrors.length > 0) {
-                                    return customErrors.join(" "); // Combine multiple errors into one string
-                                }
-                                return undefined; // No errors
-                            };
-                        }
-                        if (!originalImplementation.signUpPOST) {
-                            throw new Error("signUpPOST is not defined in originalImplementation");
+                            const customErrors = validatePassword(passwordField.value as string);
+                            if (customErrors.length > 0) {
+                                return {
+                                    status: "GENERAL_ERROR",
+                                    message: customErrors.join(" ")
+                                };
+                            }
                         }
                         return originalImplementation.signUpPOST(input);
                     },
                     passwordResetPOST: async function (input) {
-                        // The field ID for the new password in the reset flow is "newPassword" by default
                         const passwordField = input.formFields.find(field => field.id === "newPassword");
                         if (passwordField) {
-                            const originalValidate = passwordField.validate;
-                            passwordField.validate = async (value) => {
-                                const superTokensErrors = await originalValidate(value);
-                                 if (superTokensErrors !== undefined && typeof superTokensErrors === 'string') {
-                                    return superTokensErrors;
-                                }
-                                const customErrors = validatePassword(value);
-                                if (customErrors.length > 0) {
-                                    return customErrors.join(" ");
-                                }
-                                return undefined; // No errors
-                            };
-                        }
-                        if (!originalImplementation.passwordResetPOST) {
-                            throw new Error("passwordResetPOST is not defined in originalImplementation");
+                            const customErrors = validatePassword(passwordField.value as string);
+                            if (customErrors.length > 0) {
+                                return {
+                                    status: "GENERAL_ERROR",
+                                    message: customErrors.join(" ")
+                                };
+                            }
                         }
                         return originalImplementation.passwordResetPOST(input);
                     }
@@ -151,22 +126,15 @@ export const SuperTokensConfig: TypeInput = {
         cookieDomain: "localhost",
         sessionExpiredStatusCode: 401,
         override: {
-            sessionFeature: {
-                getTenantId: async (context) => {
-                    // context.req is the Express Request object
-                    return getTenantIdFromURL(context.req as Request);
-                }
+            functions: (originalImplementation) => {
+                return {
+                    ...originalImplementation,
+                    getTenantId: async (context) => {
+                        return getTenantIdFromURL(context.req as Request);
+                    }
+                };
             }
         }
-        // errorHandlers: {
-        //   onUnauthorised: async (message, request, response) => {
-        //     // Your error handling
-        //     console.log("i dont know what im doing ")
-        //     console.log("message",message)
-        //     console.log("request",request)
-        //     console.log("response",response)
-
-        //   }}
     })
 ],
 };

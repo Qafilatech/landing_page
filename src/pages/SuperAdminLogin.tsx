@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { signIn } from 'supertokens-auth-react/recipe/emailpassword';
 
 // TODO: Import actual UI components if available (Input, Button, etc.)
-// import { Input } from '@/components/ui/input';
-// import { Button } from '@/components/ui/button';
-// import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 const superAdminTenantId = "superadmin_tenant"; // As defined in previous steps
 
 const SuperAdminLogin: React.FC = () => {
     const navigate = useNavigate();
-    // const { toast } = useToast(); // TODO: Uncomment if using a toast library
+    const { toast } = useToast(); 
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -35,25 +35,21 @@ const SuperAdminLogin: React.FC = () => {
             });
 
             if (response.status === "OK") {
-                // Successful login
-                // TODO: Show success toast if available
-                // toast({ title: 'Success', description: 'Super admin login successful.' });
+
+                toast({ title: 'Success', description: 'Super admin login successful.' });
                 navigate('/superadmin/dashboard'); // Navigate to a placeholder super admin dashboard
             } else if (response.status === "WRONG_CREDENTIALS_ERROR") {
                 setError("Incorrect email or password.");
-                // TODO: Show error toast if available
-                // toast({ title: 'Error', description: 'Incorrect email or password.', variant: 'destructive' });
+                toast({ title: 'Error', description: 'Incorrect email or password.', variant: 'destructive' });
             } else {
                 // Handle other errors like "SIGN_IN_NOT_ALLOWED", etc.
                 setError("An unexpected error occurred. Please try again.");
-                // TODO: Show error toast if available
-                // toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+                toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
                 console.error("Super admin sign in error:", response);
             }
         } catch (err: any) {
             setError(err.message || "An unexpected error occurred during login.");
-            // TODO: Show error toast if available
-            // toast({ title: 'Error', description: err.message || 'Login failed.', variant: 'destructive' });
+            toast({ title: 'Error', description: err.message || 'Login failed.', variant: 'destructive' });
             console.error("Super admin sign in exception:", err);
         } finally {
             setIsLoading(false);
@@ -71,8 +67,7 @@ const SuperAdminLogin: React.FC = () => {
                     >
                         Email:
                     </label>
-                    {/* TODO: Replace with <Input /> component */}
-                    <input
+                    <Input
                         id="email"
                         type="email"
                         value={email}
@@ -89,8 +84,7 @@ const SuperAdminLogin: React.FC = () => {
                     >
                         Password:
                     </label>
-                    {/* TODO: Replace with <Input /> component */}
-                    <input
+                    <Input
                         id="password"
                         type="password"
                         value={password}
@@ -105,8 +99,7 @@ const SuperAdminLogin: React.FC = () => {
                         {error}
                     </p>
                 )}
-                {/* TODO: Replace with <Button /> component */}
-                <button
+                <Button
                     type="submit"
                     disabled={isLoading}
                     style={{
@@ -122,7 +115,7 @@ const SuperAdminLogin: React.FC = () => {
                     }}
                 >
                     {isLoading ? 'Logging in...' : 'Login'}
-                </button>
+                </Button>
             </form>
         </div>
     );

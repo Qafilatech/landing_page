@@ -1,17 +1,15 @@
 import React, { useState, useEffect, FormEvent } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 
-// TODO: Import actual UI components e.g. from '../components/ui'
-// import { Input } from '../components/ui/input';
-// import { Button } from '../components/ui/button';
-// TODO: Import toast notification hook e.g. from '../components/ui/use-toast'
-// import { useToast } from '../components/ui/use-toast';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { useToast } from '../components/ui/use-toast';
 
 const ActivateAccount: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { tenantId } = useParams<{ tenantId: string }>();
-    // const { toast } = useToast(); // TODO: Uncomment when useToast is available
+    const { toast } = useToast(); 
 
     const [token, setToken] = useState<string | null>(null);
     const [password, setPassword] = useState<string>('');
@@ -25,14 +23,12 @@ const ActivateAccount: React.FC = () => {
             setToken(tokenFromUrl);
         } else {
             setMessage('Activation token not found in URL. Please check the link.');
-            // TODO: Show error toast for missing token
-            // toast({ title: 'Error', description: 'Activation token not found.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Activation token not found.', variant: 'destructive' });
         }
 
         if (!tenantId) {
             setMessage('Tenant ID not found in URL. Please check the link.');
-            // TODO: Show error toast for missing tenantId
-            // toast({ title: 'Error', description: 'Tenant ID not found.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Tenant ID not found.', variant: 'destructive' });
         }
     }, [searchParams, tenantId /*, toast*/]); // TODO: Add toast to dependency array if used
 
@@ -42,29 +38,25 @@ const ActivateAccount: React.FC = () => {
 
         if (!tenantId) {
             setMessage('Tenant ID is missing. Cannot proceed.');
-            // TODO: Show error toast
-            // toast({ title: 'Error', description: 'Tenant ID is missing.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Tenant ID is missing.', variant: 'destructive' });
             return;
         }
 
         if (!token) {
             setMessage('No activation token available. Cannot proceed.');
-            // TODO: Show error toast
-            // toast({ title: 'Error', description: 'No activation token.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'No activation token.', variant: 'destructive' });
             return;
         }
 
         if (password !== confirmPassword) {
             setMessage('Passwords do not match.');
-            // TODO: Show error toast
-            // toast({ title: 'Error', description: 'Passwords do not match.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Passwords do not match.', variant: 'destructive' });
             return;
         }
 
         if (password.length < 8) { // Example basic validation
             setMessage('Password must be at least 8 characters long.');
-            // TODO: Show error toast
-            // toast({ title: 'Error', description: 'Password too short.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Password too short.', variant: 'destructive' });
             return;
         }
 
@@ -83,22 +75,19 @@ const ActivateAccount: React.FC = () => {
 
             if (response.ok) {
                 setMessage(`Password set successfully for ${tenantId}! Redirecting to login...`);
-                // TODO: Show success toast
-                // toast({ title: 'Success', description: `Password set for ${tenantId}. Redirecting...` });
+                toast({ title: 'Success', description: `Password set for ${tenantId}. Redirecting...` });
                 setTimeout(() => {
                     // TODO: Consider if login route should also be tenant-aware e.g. navigate(`/${tenantId}/auth`)
                     navigate('/auth');
                 }, 3000);
             } else {
                 setMessage(data.message || `An error occurred for ${tenantId}. Please try again.`);
-                // TODO: Show error toast
-                // toast({ title: 'Error', description: data.message || `Failed to set password for ${tenantId}.`, variant: 'destructive' });
+                toast({ title: 'Error', description: data.message || `Failed to set password for ${tenantId}.`, variant: 'destructive' });
             }
         } catch (error) {
             console.error(`Activation error for tenant ${tenantId}:`, error);
             setMessage(`An unexpected error occurred for ${tenantId}. Please check your connection or try again later.`);
-            // TODO: Show error toast
-            // toast({ title: 'Error', description: `An unexpected error occurred for ${tenantId}.`, variant: 'destructive' });
+            toast({ title: 'Error', description: `An unexpected error occurred for ${tenantId}.`, variant: 'destructive' });
         } finally {
             setIsLoading(false);
         }
@@ -114,8 +103,7 @@ const ActivateAccount: React.FC = () => {
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '15px' }}>
                         <label htmlFor="password">New Password:</label>
-                        {/* TODO: Replace with <Input /> component */}
-                        <input
+                        <Input
                             type="password"
                             id="password"
                             value={password}
@@ -126,8 +114,7 @@ const ActivateAccount: React.FC = () => {
                     </div>
                     <div style={{ marginBottom: '15px' }}>
                         <label htmlFor="confirmPassword">Confirm New Password:</label>
-                        {/* TODO: Replace with <Input /> component */}
-                        <input
+                        <Input
                             type="password"
                             id="confirmPassword"
                             value={confirmPassword}
@@ -136,14 +123,13 @@ const ActivateAccount: React.FC = () => {
                             style={{ width: '100%', padding: '8px', marginTop: '5px' }}
                         />
                     </div>
-                    {/* TODO: Replace with <Button /> component */}
-                    <button
+                    <Button
                         type="submit"
                         disabled={isLoading || !token || !tenantId}
                         style={{ width: '100%', padding: '10px', backgroundColor: (isLoading || !token || !tenantId) ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                     >
                         {isLoading ? 'Setting Password...' : 'Set Password'}
-                    </button>
+                    </Button>
                 </form>
             ) : (
                 <p style={{color: 'red'}}>

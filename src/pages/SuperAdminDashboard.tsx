@@ -60,14 +60,39 @@ const SuperAdminDashboard: React.FC = () => {
         }
         */
 
-        // Simulate API call success for now
-        setTimeout(() => {
-            setSuccessMessage(`Company '${companyName}' registered and tenant '${desiredTenantId}' creation initiated successfully (SIMULATED).`);
+        try{
+            const apiResponse = await fetch('/api/superadmin_tenant/companies/create',
+                {
+                    method: 'POST',
+                    headers: {'Content-Type': 'applicaiton/json'},
+                    body: JSON.stringify({ companyName, tenantId: desiredTenantId, details: otherCompanyDetails})
+
+                }
+            );
+            const data = await apiResponse.json();
+            if (!apiResponse.ok){
+                throw new Error(data.message || 'Faile to register compnay.');
+            }
+            setSuccessMessage(`Company '${companyName}' registered and tenant '${desiredTenantId}' created initiated.`);
             setCompanyName('');
             setDesiredTenantId('');
             setOtherCompanyDetails('');
+        } catch (err: any){
+            setError(err.message || 'An error ocurred during company registration.')
+        } finally {
             setIsLoading(false);
-        }, 1000);
+        }
+
+        //TODO DELETE THIS
+        // // Simulate API call success for now
+        // setTimeout(() => {
+        //     setSuccessMessage(`Company '${companyName}' registered and tenant '${desiredTenantId}' creation initiated successfully (SIMULATED).`);
+        //     setCompanyName('');
+        //     setDesiredTenantId('');
+        //     setOtherCompanyDetails('');
+        //     setIsLoading(false);
+        // }, 1000);
+
     };
 
     const handleLogout = async () => {
@@ -75,6 +100,7 @@ const SuperAdminDashboard: React.FC = () => {
         navigate('/superadmin/login'); // Or your desired logout destination
     };
 
+    // TODO TARIQ DESIGN
     // Handle session loading state
     if (sessionContext.loading) {
         return (
@@ -84,6 +110,7 @@ const SuperAdminDashboard: React.FC = () => {
         );
     }
 
+    //TODO 
     // Redirect if not authenticated (though SessionAuth should handle this, this is an explicit check)
     // Note: This check might be redundant if SessionAuth's default behavior is to redirect.
     // However, it can be useful if you need custom logic before redirection or if you're not using onUnauthorised in Session.init.
