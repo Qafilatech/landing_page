@@ -1,204 +1,157 @@
 import { useState } from 'react';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
-import { setAdminStatus } from '@/utils/adminUtils';
+import { superuserLogin } from '@/lib/adminAuth';
 
+/**
+ * Operator sign-in — uses qafila-platform POST /api/v1/auth/superuser/login.
+ * Email must be on the server SUPERUSER_EMAIL allow-list.
+ */
 const Auth = () => {
   const { language, setLanguage } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [showSignIn, setShowSignIn] = useState(true);
-
-  // Add your own state for form fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const texts = {
     en: {
       backToHome: 'Back to home',
+      signIn: 'Operator sign in',
+      emailAddress: 'Email address',
+      password: 'Password',
+      signInButton: 'Sign in',
+      changeLanguage: 'AR',
+      joinPlatform: 'QafilaTech Ops',
+      platformDescription:
+        'Sign in with your allow-listed operator account to manage orders, drivers, and support.',
+      success: 'Signed in',
+      failed: 'Sign in failed',
     },
     ar: {
       backToHome: 'العودة إلى الصفحة الرئيسية',
-    }
-  };
-
-  const authTexts = {
-    en: {
-      createAccount: 'Create an account',
-      signIn: 'Sign in to your account',
-      emailAddress: 'Email address',
-      password: 'Password',
-      confirmPassword: 'Confirm Password',
-      signUpButton: 'Sign up',
-      signInButton: 'Sign in',
-      alreadyHaveAccount: 'Already have an account?',
-      dontHaveAccount: 'Don\'t have an account?',
-      createOne: 'Create one',
-      switchToSignIn: 'Sign in',
-      switchToSignUp: 'Create account',
-      changeLanguage: 'AR',
-      joinPlatform: 'Join Our Platform',
-      platformDescription: 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.',
-      adminAccess: 'Admin Access',
-      adminNote: 'This is for demo purposes only'
-    },
-    ar: {
-      createAccount: 'إنشاء حساب',
-      signIn: 'تسجيل الدخول إلى حسابك',
+      signIn: 'تسجيل دخول المشغّل',
       emailAddress: 'عنوان البريد الإلكتروني',
       password: 'كلمة المرور',
-      confirmPassword: 'تأكيد كلمة المرور',
-      signUpButton: 'إنشاء حساب',
       signInButton: 'تسجيل الدخول',
-      alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
-      dontHaveAccount: 'ليس لديك حساب؟',
-      createOne: 'إنشاء حساب',
-      switchToSignIn: 'تسجيل الدخول',
-      switchToSignUp: 'إنشاء حساب',
       changeLanguage: 'EN',
-      joinPlatform: 'انضم إلى منصتنا',
-      platformDescription: 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.',
-      adminAccess: 'وصول المسؤول',
-      adminNote: 'هذا لأغراض العرض التوضيحي فقط'
-    }
-  };
+      joinPlatform: 'عمليات QafilaTech',
+      platformDescription:
+        'سجّل الدخول بحساب المشغّل المصرّح به لإدارة الطلبات والسائقين والدعم.',
+      success: 'تم تسجيل الدخول',
+      failed: 'فشل تسجيل الدخول',
+    },
+  } as const;
 
-  // Add your own submit handlers
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Add your sign-in logic here
-    if (isAdmin) {
-      setAdminStatus(true);
-    }
-    navigate('/');
-  };
+  const t = texts[language];
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add your sign-up logic here
-    navigate('/');
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await superuserLogin(email, password);
+      toast({ title: t.success });
+      navigate('/admin');
+    } catch (err) {
+      toast({
+        title: t.failed,
+        description: err instanceof Error ? err.message : String(err),
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className={`min-h-screen flex flex-col md:flex-row ${language === 'ar' ? 'rtl' : 'ltr'}`}>
-      {/* Left section - Form */}
       <div className="flex flex-col justify-center w-full md:w-1/2 px-6 py-12 lg:px-8">
-        <Link to="/" className={`absolute top-8 ${language === 'ar' ? 'right-8' : 'left-8'} flex items-center text-primary hover:text-primary/80 transition-colors`}>
-          <ArrowLeft className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4 ${language === 'ar' ? 'transform rotate-180' : ''}`} />
-          {texts[language].backToHome}
+        <Link
+          to="/"
+          className={`absolute top-8 ${language === 'ar' ? 'right-8' : 'left-8'} flex items-center text-primary hover:text-primary/80 transition-colors`}
+        >
+          <ArrowLeft
+            className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4 ${language === 'ar' ? 'transform rotate-180' : ''}`}
+          />
+          {t.backToHome}
         </Link>
 
         <button
+          type="button"
           onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
-          className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-white/80 text-primary`}
+          className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-white text-primary`}
         >
-          {authTexts[language].changeLanguage}
+          {t.changeLanguage}
         </button>
 
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            {showSignIn ? authTexts[language].signIn : authTexts[language].createAccount}
+          <img
+            src="/QT-Logo/Dark/LogoDark.png"
+            alt="QafilaTech"
+            className="mx-auto h-10 w-auto object-contain mb-4"
+          />
+          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            {t.signIn}
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {showSignIn ? (
-            <>
-              <form onSubmit={handleSignIn}>
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <label className="block">
+              <span className="sr-only">{t.emailAddress}</span>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="email"
-                  placeholder={authTexts[language].emailAddress}
+                  placeholder={t.emailAddress}
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 p-2 border rounded"
                   required
+                  autoComplete="username"
                 />
-                <input
-                  type="password"
-                  placeholder={authTexts[language].password}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
-                  required
-                />
-                <button type="submit" className="w-full bg-primary text-white py-2 rounded">
-                  {authTexts[language].signInButton}
-                </button>
-              </form>
-              <div className="mt-6 text-center text-sm text-gray-500">
-                {authTexts[language].dontHaveAccount}{' '}
-                <button
-                  onClick={() => setShowSignIn(false)}
-                  className="font-semibold text-primary hover:text-primary/80"
-                >
-                  {authTexts[language].createOne}
-                </button>
               </div>
-            </>
-          ) : (
-            <>
-              <form onSubmit={handleSignUp}>
-                <input
-                  type="email"
-                  placeholder={authTexts[language].emailAddress}
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
-                  required
-                />
+            </label>
+            <label className="block">
+              <span className="sr-only">{t.password}</span>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="password"
-                  placeholder={authTexts[language].password}
+                  placeholder={t.password}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 p-2 border rounded"
                   required
+                  autoComplete="current-password"
                 />
-                <input
-                  type="password"
-                  placeholder={authTexts[language].confirmPassword}
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
-                  required
-                />
-                <button type="submit" className="w-full bg-primary text-white py-2 rounded">
-                  {authTexts[language].signUpButton}
-                </button>
-              </form>
-              <div className="mt-6 text-center text-sm text-gray-500">
-                {authTexts[language].alreadyHaveAccount}{' '}
-                <button
-                  onClick={() => setShowSignIn(true)}
-                  className="font-semibold text-primary hover:text-primary/80"
-                >
-                  {authTexts[language].switchToSignIn}
-                </button>
               </div>
-            </>
-          )}
-
-          
+            </label>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full btn-main flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t.signInButton}
+            </button>
+          </form>
         </div>
       </div>
 
-      {/* Right section - Image */}
-      <div className="hidden md:block md:w-1/2 bg-gray-100">
-        <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80)' }}>
-          <div className="h-full w-full bg-gradient-to-b from-black/60 to-black/20 flex items-center justify-center">
-            <div className="text-center px-8 py-12 max-w-md">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                {authTexts[language].joinPlatform}
-              </h2>
-              <p className="text-white/90">
-                {authTexts[language].platformDescription}
-              </p>
-            </div>
-          </div>
+      <div className="hidden md:flex md:w-1/2 bg-primary/90 text-white items-center justify-center p-12">
+        <div className="max-w-md">
+          <img
+            src="/QT-Logo/Light/LogoLight.png"
+            alt="QafilaTech"
+            className="h-12 w-auto object-contain mb-6"
+          />
+          <h1 className="text-3xl font-bold mb-4">{t.joinPlatform}</h1>
+          <p className="text-white/90 leading-relaxed">{t.platformDescription}</p>
         </div>
       </div>
     </div>

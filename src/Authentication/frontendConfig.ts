@@ -1,25 +1,25 @@
-// import EmailPasswordWebJs from 'supertokens-web-js/recipe/emailpassword'
+import { appInfo } from './appInfo';
 import EmailPassword from 'supertokens-auth-react/recipe/emailpassword';
-import Session from "supertokens-auth-react/recipe/session";
-import { appInfo } from './appInfo'
-import Auth from '@/pages/Auth';
+import Session from 'supertokens-auth-react/recipe/session';
 
-export const frontendConfig = () => {
-  return {
-    appInfo,
-    recipeList: [
-      EmailPassword.init({
-        signInAndUpFeature: {
-            signInForm: {
-                    formFields: [{
-                        id: "email",
-                        label: "Your Email",
-                        getDefaultValue: () => "john.doe@gmail.com"
-                    }]
-                }
+/**
+ * SuperTokens client config pointed at qafila-platform.
+ * Admin UI uses custom login (POST /api/v1/auth/superuser/login) and stores
+ * st-access-token for subsequent /api/superuser/* calls.
+ */
+export const frontendConfig = () => ({
+  appInfo,
+  recipeList: [
+    EmailPassword.init({
+      // Custom Auth.tsx handles the form; disable prebuilt UI.
+      style: `
+        [data-supertokens~=container] {
+          display: none;
         }
-      }),
-      Session.init(),
-    ],
-  };
-}
+      `,
+    }),
+    Session.init({
+      tokenTransferMethod: 'header',
+    }),
+  ],
+});

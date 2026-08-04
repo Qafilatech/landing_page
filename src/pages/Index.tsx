@@ -57,7 +57,7 @@ const Index = () => {
       <Navbar activeButton={activeButton} setActiveButton={setActiveButton} />
       <main>
         <Hero />
-        <Features activeButton={activeButton} />
+        <Features />
         <HowItWorks />
         <CTA />
       </main>

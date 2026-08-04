@@ -103,15 +103,14 @@ const Navbar = ({ activeButton, setActiveButton }) => {
               {texts[language].trucker}
             </a>
 
-            {/*Sign Up Toggle */}
-
-            {/* <Link
+            {/* Operator sign-in */}
+            <Link
               to="/auth"
-            className="flex items-center justify-center px-4 py-2 rounded-full bg-white/90 shadow-sm border border-gray-200 text-primary font-medium hover:bg-white transition-colors">
-            
-            <LogIn className='h-4 w-4 mr-2'/>
-            <span>{texts[language].signUpLogin}</span>
-            </Link> */}
+              className="flex items-center justify-center px-4 py-2 rounded-full bg-white/90 shadow-sm border border-gray-200 text-primary font-medium hover:bg-white transition-colors"
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              <span>{texts[language].signUpLogin}</span>
+            </Link>
 
             {/* Language Toggle */}
 

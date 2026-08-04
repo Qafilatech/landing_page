@@ -1,19 +1,21 @@
-# System files
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
 .DS_Store
-
-# Ignore everything by default
-*
-
-# Allowlist specific files and folders
-!package.json
-!package-lock.json
-!yarn.lock
-!tsconfig.json
-!public/
-!src/
-!src/** 
-!README.md
-!LICENSE
-!.gitignore
-!*.ts          # Include all top-level TypeScript files
-!*.tsx
+.idea/
+*.suo
+*.sw?

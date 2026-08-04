@@ -1,515 +1,680 @@
-import React, { useState } from 'react';
-import {  Phone, Mail, Calendar, Star, X, MapPin, Truck } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  Loader2,
+  RefreshCw,
+  Search,
+  Phone,
+  Mail,
+  ExternalLink,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldX,
+} from 'lucide-react';
+import { platformFetch } from '@/lib/platformApi';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
-const DriversManagement = ({ language }) => {
+type ApiTruck = {
+  truck_id: number;
+  license_plate?: string | null;
+  truck_type?: string | null;
+  vehicle_size?: string | null;
+  vehicle_year?: number | null;
+  vehicle_detail?: string | null;
+  insurance_company_details?: string | null;
+  insurance_id?: string | null;
+  insurance_expiry?: string | null;
+  insurance_card_upload?: string | null;
+  vehicle_registration_upload?: string | null;
+  vehicle_photo?: string | null;
+  truck_photo?: string | null;
+};
+
+type ApiDriver = {
+  driver_id: number;
+  status?: string | null;
+  driver_type?: string | null;
+  license_number?: string | null;
+  is_verified?: boolean;
+  kyc_status?: string | null;
+  kyc_denied_reason?: string | null;
+  id_card_upload?: string | null;
+  drivers_license_upload?: string | null;
+  vehicle_registration_upload?: string | null;
+  insurance_card_upload?: string | null;
+  attachment_url?: string | null;
+  rating_avg?: number | null;
+  user?: {
+    name?: string | null;
+    display_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    created_at?: string;
+  };
+  trucks?: ApiTruck[];
+  business?: { company_name?: string | null } | null;
+  edit_requests?: Array<{
+    request_id: number;
+    kind: string;
+    status: string;
+    created_at?: string;
+  }>;
+};
+
+function DocLink({
+  label,
+  url,
+}: {
+  label: string;
+  url?: string | null;
+}) {
+  if (!url) {
+    return (
+      <div className="rounded border border-dashed p-3 text-sm text-gray-400">
+        {label}: not uploaded
+      </div>
+    );
+  }
+  const isImg = /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url);
+  return (
+    <div className="rounded border p-3 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-sm font-medium">{label}</span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs text-primary inline-flex items-center gap-1 hover:underline"
+        >
+          Open <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+      {isImg ? (
+        <a href={url} target="_blank" rel="noreferrer">
+          <img
+            src={url}
+            alt={label}
+            className="max-h-40 w-full object-contain rounded bg-gray-50"
+          />
+        </a>
+      ) : (
+        <p className="text-xs text-gray-500 break-all">{url}</p>
+      )}
+    </div>
+  );
+}
+
+const DriversManagement = ({
+  language,
+  initialVerifiedFilter,
+}: {
+  language: string;
+  initialVerifiedFilter?: 'all' | 'true' | 'false';
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedDriver, setSelectedDriver] = useState(null);
-  const [showDriverModal, setShowDriverModal] = useState(false);
+  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'true' | 'false' | 'denied'>(
+    initialVerifiedFilter === 'false'
+      ? 'false'
+      : initialVerifiedFilter === 'true'
+        ? 'true'
+        : 'all',
+  );
+  const [drivers, setDrivers] = useState<ApiDriver[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [detail, setDetail] = useState<ApiDriver | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [acting, setActing] = useState(false);
+  const [denyReason, setDenyReason] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [insuranceCompany, setInsuranceCompany] = useState('');
+  const [insuranceId, setInsuranceId] = useState('');
+  const [insuranceExpiry, setInsuranceExpiry] = useState('');
+  const [plate, setPlate] = useState('');
 
-  // Mock data for drivers
-  const driversList = [
-    {
-      id: 'DRV001',
-      name: 'John Smith',
-      phone: '+(968) 123454567',
-      email: 'john.smith@example.com',
-      vehicle: 'Honda Civic - ABC123',
-      status: 'Online',
-      dateJoined: '2023-05-15',
-      totalDeliveries: 128,
-      rating: 4.8,
-      location: { lat: 40.7128, lng: -74.006 },
-      available: true,
-      recentDeliveries: [
-        { id: 'ORD1234', date: '2023-10-02', amount: 25.50, status: 'Delivered' },
-        { id: 'ORD1212', date: '2023-10-01', amount: 32.75, status: 'Delivered' },
-        { id: 'ORD1198', date: '2023-09-30', amount: 18.25, status: 'Delivered' }
-      ],
-      metrics: {
-        onTimeRate: '95%',
-        avgDeliveryTime: '28 min',
-        totalRevenue: '1,845.50'
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '50',
+        status: statusFilter,
+      });
+      if (verifiedFilter === 'denied') {
+        params.set('kyc_status', 'denied');
+      } else if (verifiedFilter === 'false') {
+        params.set('kyc_status', 'pending');
+      } else if (verifiedFilter === 'true') {
+        params.set('kyc_status', 'verified');
+      } else {
+        params.set('verified', 'all');
       }
-    },
-    {
-      id: 'DRV002',
-      name: 'Sarah Johnson',
-      phone: '+1 (555) 987-6543',
-      email: 'sarah.j@example.com',
-      vehicle: 'Toyota Corolla - XYZ789',
-      status: 'On Delivery',
-      dateJoined: '2023-06-22',
-      totalDeliveries: 95,
-      rating: 4.9,
-      location: { lat: 40.7282, lng: -73.794 },
-      available: false,
-      recentDeliveries: [
-        { id: 'ORD1255', date: '2023-10-02', amount: 42.30, status: 'In Progress' },
-        { id: 'ORD1240', date: '2023-10-01', amount: 29.50, status: 'Delivered' },
-        { id: 'ORD1210', date: '2023-09-30', amount: 35.75, status: 'Delivered' }
-      ],
-      metrics: {
-        onTimeRate: '98%',
-        avgDeliveryTime: '25 min',
-        totalRevenue: '1,520.75'
-      }
-    },
-    {
-      id: 'DRV003',
-      name: 'Michael Rodriguez',
-      phone: '+1 (555) 456-7890',
-      email: 'mike.r@example.com',
-      vehicle: 'Ford Focus - DEF456',
-      status: 'Offline',
-      dateJoined: '2023-03-10',
-      totalDeliveries: 156,
-      rating: 4.6,
-      location: null,
-      available: false,
-      recentDeliveries: [
-        { id: 'ORD1188', date: '2023-09-30', amount: 27.45, status: 'Delivered' },
-        { id: 'ORD1175', date: '2023-09-29', amount: 34.20, status: 'Delivered' },
-        { id: 'ORD1162', date: '2023-09-28', amount: 19.95, status: 'Delivered' }
-      ],
-      metrics: {
-        onTimeRate: '92%',
-        avgDeliveryTime: '30 min',
-        totalRevenue: '2,145.20'
-      }
-    },
-    {
-      id: 'DRV004',
-      name: 'Emily Chen',
-      phone: '+1 (555) 234-5678',
-      email: 'emily.c@example.com',
-      vehicle: 'Nissan Altima - GHI789',
-      status: 'Online',
-      dateJoined: '2023-08-05',
-      totalDeliveries: 67,
-      rating: 4.7,
-      location: { lat: 40.7589, lng: -73.985 },
-      available: true,
-      recentDeliveries: [
-        { id: 'ORD1245', date: '2023-10-02', amount: 31.80, status: 'Delivered' },
-        { id: 'ORD1232', date: '2023-10-01', amount: 24.50, status: 'Delivered' },
-        { id: 'ORD1220', date: '2023-09-30', amount: 29.75, status: 'Delivered' }
-      ],
-      metrics: {
-        onTimeRate: '94%',
-        avgDeliveryTime: '27 min',
-        totalRevenue: '975.50'
-      }
-    },
-    {
-      id: 'DRV005',
-      name: 'David Wilson',
-      phone: '+1 (555) 345-6789',
-      email: 'david.w@example.com',
-      vehicle: 'Honda Accord - JKL012',
-      status: 'Break',
-      dateJoined: '2023-04-18',
-      totalDeliveries: 112,
-      rating: 4.5,
-      location: { lat: 40.7702, lng: -73.922 },
-      available: false,
-      recentDeliveries: [
-        { id: 'ORD1222', date: '2023-09-30', amount: 38.25, status: 'Delivered' },
-        { id: 'ORD1205', date: '2023-09-29', amount: 26.75, status: 'Delivered' },
-        { id: 'ORD1190', date: '2023-09-28', amount: 22.50, status: 'Delivered' }
-      ],
-      metrics: {
-        onTimeRate: '90%',
-        avgDeliveryTime: '32 min',
-        totalRevenue: '1,685.75'
-      }
-    }
-  ];
-
-  const texts = {
-    en: {
-      driversManagement: 'Drivers Management',
-      search: 'Search drivers...',
-      all: 'All',
-      online: 'Online',
-      offline: 'Offline',
-      onDelivery: 'On Delivery',
-      onBreak: 'On Break',
-      driverId: 'Driver ID',
-      name: 'Name',
-      status: 'Status',
-      vehicle: 'Vehicle',
-      deliveries: 'Deliveries',
-      rating: 'Rating',
-      viewDetails: 'View Details',
-      driverDetails: 'Driver Details',
-      contactInfo: 'Contact Information',
-      phone: 'Phone',
-      email: 'Email',
-      dateJoined: 'Date Joined',
-      deliveryHistory: 'Delivery History',
-      performanceMetrics: 'Performance Metrics',
-      onTimeRate: 'On-time Rate',
-      avgDeliveryTime: 'Avg. Delivery Time',
-      totalRevenue: 'Total Revenue',
-      close: 'Close',
-      orderID: 'Order ID',
-      date: 'Date',
-      amount: 'Amount',
-      assignedOrders: 'Assigned Orders',
-      noDriverSelected: 'Select a driver to view details',
-      actions: 'Actions',
-      totalDeliveries: 'Total Deliveries',
-      currentLocation: 'Current Location',
-      available: 'Available',
-      notAvailable: 'Not Available',
-      viewOnMap: 'View on Map'
-    },
-    ar: {
-      driversManagement: 'إدارة السائقين',
-      search: 'بحث عن السائقين...',
-      all: 'الكل',
-      online: 'متصل',
-      offline: 'غير متصل',
-      onDelivery: 'في التوصيل',
-      onBreak: 'في استراحة',
-      driverId: 'معرف السائق',
-      name: 'الاسم',
-      status: 'الحالة',
-      vehicle: 'المركبة',
-      deliveries: 'التوصيلات',
-      rating: 'التقييم',
-      viewDetails: 'عرض التفاصيل',
-      driverDetails: 'تفاصيل السائق',
-      contactInfo: 'معلومات الاتصال',
-      phone: 'الهاتف',
-      email: 'البريد الإلكتروني',
-      dateJoined: 'تاريخ الانضمام',
-      deliveryHistory: 'تاريخ التوصيل',
-      performanceMetrics: 'مقاييس الأداء',
-      onTimeRate: 'معدل الالتزام بالوقت',
-      avgDeliveryTime: 'متوسط وقت التوصيل',
-      totalRevenue: 'إجمالي الإيرادات',
-      close: 'إغلاق',
-      orderID: 'رقم الطلب',
-      date: 'التاريخ',
-      amount: 'المبلغ',
-      assignedOrders: 'الطلبات المخصصة',
-      noDriverSelected: 'اختر سائقًا لعرض التفاصيل',
-      actions: 'إجراءات',
-      totalDeliveries: 'إجمالي التسليمات',
-      currentLocation: 'الموقع الحالي',
-      available: 'متاح',
-      notAvailable: 'غير متاح',
-      viewOnMap: 'عرض على الخريطة'
+      if (searchTerm.trim()) params.set('search', searchTerm.trim());
+      const { data } = await platformFetch<{
+        success: boolean;
+        data: ApiDriver[];
+        pagination?: { total: number };
+      }>(`/api/superuser/drivers?${params}`);
+      setDrivers(Array.isArray(data.data) ? data.data : []);
+      setTotal(data.pagination?.total ?? 0);
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : (e as { message?: string }).message || 'Failed to load drivers',
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredDrivers = driversList.filter(driver => {
-    const matchesSearch = driver.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          driver.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || driver.status.toLowerCase().includes(statusFilter.toLowerCase());
-    return matchesSearch && matchesStatus;
-  });
+  useEffect(() => {
+    void load();
+  }, [statusFilter, verifiedFilter]);
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'online': return 'bg-green-500';
-      case 'offline': return 'bg-gray-500';
-      case 'on delivery': return 'bg-blue-500';
-      case 'break': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
+  useEffect(() => {
+    if (initialVerifiedFilter) setVerifiedFilter(initialVerifiedFilter);
+  }, [initialVerifiedFilter]);
+
+  const openDetail = async (id: number) => {
+    setSelectedId(id);
+    setDetail(null);
+    setDetailLoading(true);
+    setDenyReason('');
+    try {
+      const { data } = await platformFetch<{ success: boolean; data: ApiDriver }>(
+        `/api/superuser/drivers/${id}`,
+      );
+      const d = data.data;
+      setDetail(d);
+      setLicenseNumber(d.license_number || '');
+      const truck = d.trucks?.[0];
+      setInsuranceCompany(truck?.insurance_company_details || '');
+      setInsuranceId(truck?.insurance_id || '');
+      setInsuranceExpiry(
+        truck?.insurance_expiry
+          ? String(truck.insurance_expiry).slice(0, 10)
+          : '',
+      );
+      setPlate(truck?.license_plate || '');
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : (e as { message?: string }).message || 'Failed to load driver',
+      );
+      setSelectedId(null);
+    } finally {
+      setDetailLoading(false);
     }
   };
 
-  const handleViewDetails = (driver) => {
-    setSelectedDriver(driver);
-    setShowDriverModal(true);
+  const submitKyc = async (action: 'approve' | 'deny') => {
+    if (!selectedId) return;
+    setActing(true);
+    setError(null);
+    try {
+      await platformFetch(`/api/superuser/drivers/${selectedId}/kyc`, {
+        method: 'POST',
+        body: JSON.stringify({
+          action,
+          reason: denyReason || undefined,
+          fields: { license_number: licenseNumber || undefined },
+          truck_fields: {
+            truck_id: detail?.trucks?.[0]?.truck_id,
+            insurance_company_details: insuranceCompany || undefined,
+            insurance_id: insuranceId || undefined,
+            insurance_expiry: insuranceExpiry || undefined,
+            license_plate: plate || undefined,
+          },
+        }),
+      });
+      setSelectedId(null);
+      setDetail(null);
+      await load();
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : (e as { message?: string }).message || 'KYC action failed',
+      );
+    } finally {
+      setActing(false);
+    }
   };
+
+  const labels = useMemo(
+    () =>
+      language === 'ar'
+        ? {
+            title: 'السائقون',
+            search: 'بحث',
+            refresh: 'تحديث',
+            name: 'الاسم',
+            contact: 'التواصل',
+            vehicle: 'المركبة',
+            status: 'الحالة',
+            type: 'النوع',
+            kyc: 'التحقق',
+            empty: 'لا يوجد سائقون',
+            unverified: 'غير موثّق',
+            verified: 'موثّق',
+            denied: 'مرفوض',
+            needsReview: 'يحتاج مراجعة',
+            approve: 'اعتماد',
+            deny: 'رفض',
+            docs: 'المستندات',
+            details: 'تفاصيل السائق',
+            license: 'رقم الرخصة',
+            insuranceCo: 'شركة التأمين',
+            insuranceId: 'رقم التأمين',
+            insuranceExp: 'انتهاء التأمين',
+            plate: 'لوحة المركبة',
+            denyReason: 'سبب الرفض',
+            allVerified: 'كل حالات التحقق',
+            onlyUnverified: 'بانتظار المراجعة',
+            onlyVerified: 'موثّقين',
+            onlyDenied: 'مرفوضين',
+            id: 'المعرّف',
+          }
+        : {
+            title: 'Drivers',
+            search: 'Search',
+            refresh: 'Refresh',
+            name: 'Name',
+            contact: 'Contact',
+            vehicle: 'Vehicle',
+            status: 'Status',
+            type: 'Type',
+            kyc: 'KYC',
+            empty: 'No drivers found',
+            unverified: 'Unverified',
+            verified: 'Verified',
+            denied: 'Denied',
+            needsReview: 'Needs review',
+            approve: 'Approve',
+            deny: 'Deny',
+            docs: 'Uploaded documents',
+            details: 'Driver details',
+            license: 'License number',
+            insuranceCo: 'Insurance company',
+            insuranceId: 'Insurance ID',
+            insuranceExp: 'Insurance expiry',
+            plate: 'License plate',
+            denyReason: 'Denial reason',
+            allVerified: 'All KYC',
+            onlyUnverified: 'Pending review',
+            onlyVerified: 'Verified',
+            onlyDenied: 'Denied',
+            id: 'ID',
+          },
+    [language],
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">{texts[language].driversManagement}</h2>
-        <div className="flex items-center mt-4 sm:mt-0">
-          <input
-            type="text"
-            placeholder={texts[language].search}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-      </div>
-      
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button 
-          onClick={() => setStatusFilter('all')}
-          className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'all' ? 'bg-primary text-white' : 'bg-gray-200'}`}
-        >
-          {texts[language].all}
-        </button>
-        <button 
-          onClick={() => setStatusFilter('online')}
-          className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'online' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-        >
-          {texts[language].online}
-        </button>
-        <button 
-          onClick={() => setStatusFilter('offline')}
-          className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'offline' ? 'bg-gray-500 text-white' : 'bg-gray-200'}`}
-        >
-          {texts[language].offline}
-        </button>
-        <button 
-          onClick={() => setStatusFilter('delivery')}
-          className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'delivery' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-        >
-          {texts[language].onDelivery}
-        </button>
-        <button 
-          onClick={() => setStatusFilter('break')}
-          className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'break' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
-        >
-          {texts[language].onBreak}
-        </button>
-      </div>
-      
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].driverId}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].name}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].status}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].vehicle}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].deliveries}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].rating}
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {texts[language].actions}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredDrivers.map((driver) => (
-                <tr key={driver.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {driver.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {driver.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className={`flex-shrink-0 h-2.5 w-2.5 rounded-full ${getStatusColor(driver.status)} mr-2`}></div>
-                      <div className="text-sm text-gray-900">{driver.status}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {driver.vehicle}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {driver.totalDeliveries}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-900 mr-1">{driver.rating}</span>
-                      <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button 
-                      onClick={() => handleViewDetails(driver)}
-                      className="text-primary hover:text-primary/80"
-                    >
-                      {texts[language].viewDetails}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Driver Details Modal */}
-      {showDriverModal && selectedDriver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">{texts[language].driverDetails}</h2>
-              <button 
-                onClick={() => setShowDriverModal(false)} 
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Driver Basic Info */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center mb-4">
-                  <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
-                    {selectedDriver.name.charAt(0)}
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium">{selectedDriver.name}</h3>
-                    <div className="flex items-center mt-1">
-                      <div className={`h-2.5 w-2.5 rounded-full ${getStatusColor(selectedDriver.status)} mr-2`}></div>
-                      <span className="text-gray-600">{selectedDriver.status}</span>
-                    </div>
-                    <p className="text-gray-600">{selectedDriver.id}</p>
-                    <div className="mt-1">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        selectedDriver.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {selectedDriver.available ? texts[language].available : texts[language].notAvailable}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-medium">{texts[language].contactInfo}</h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    <div className="flex items-start">
-                      <Phone className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
-                      <span>{selectedDriver.phone}</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Mail className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
-                      <span>{selectedDriver.email}</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Calendar className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
-                      <span>{texts[language].dateJoined}: {selectedDriver.dateJoined}</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Truck className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
-                      <span>{selectedDriver.vehicle}</span>
-                    </div>
-                    {selectedDriver.location && (
-                      <div className="flex items-start">
-                        <MapPin className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
-                        <span>
-                          {texts[language].currentLocation}: 
-                          <button className="ml-2 text-primary hover:underline">
-                            {texts[language].viewOnMap}
-                          </button>
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Performance Metrics */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-4">{texts[language].performanceMetrics}</h4>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">{texts[language].onTimeRate}:</span>
-                    <span className="font-medium">{selectedDriver.metrics.onTimeRate}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">{texts[language].avgDeliveryTime}:</span>
-                    <span className="font-medium">{selectedDriver.metrics.avgDeliveryTime}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">{texts[language].totalRevenue}:</span>
-                    <span className="font-medium">{selectedDriver.metrics.totalRevenue}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">{texts[language].totalDeliveries}:</span>
-                    <span className="font-medium">{selectedDriver.totalDeliveries}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">{texts[language].rating}:</span>
-                    <div className="flex items-center">
-                      <span className="font-medium mr-1">{selectedDriver.rating}</span>
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Delivery History Table */}
-            <div className="mt-6">
-              <h4 className="font-medium mb-4">{texts[language].deliveryHistory}</h4>
-              <div className="bg-white border rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {texts[language].orderID}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {texts[language].date}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {texts[language].amount}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {texts[language].status}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {selectedDriver.recentDeliveries.map((delivery) => (
-                      <tr key={delivery.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {delivery.id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {delivery.date}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {delivery.amount.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${delivery.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
-                              delivery.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                            {delivery.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="mt-6 text-right">
-              <button 
-                onClick={() => setShowDriverModal(false)} 
-                className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/80 transition-colors"
-              >
-                {texts[language].close}
-              </button>
-            </div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-2xl font-bold">
+          {labels.title}{' '}
+          <span className="text-sm font-normal text-gray-500">({total})</span>
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              className="pl-8 w-56"
+              placeholder={labels.search}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void load()}
+            />
           </div>
+          <select
+            className="border rounded px-3 py-2 text-sm bg-white"
+            value={verifiedFilter}
+            onChange={(e) =>
+              setVerifiedFilter(
+                e.target.value as 'all' | 'true' | 'false' | 'denied',
+              )
+            }
+          >
+            <option value="all">{labels.allVerified}</option>
+            <option value="false">{labels.onlyUnverified}</option>
+            <option value="true">{labels.onlyVerified}</option>
+            <option value="denied">{labels.onlyDenied}</option>
+          </select>
+          <select
+            className="border rounded px-3 py-2 text-sm bg-white"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All status</option>
+            <option value="available">Available</option>
+            <option value="on_trip">On trip</option>
+            <option value="offline">Offline</option>
+          </select>
+          <Button type="button" variant="outline" onClick={() => void load()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            {labels.refresh}
+          </Button>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader2 className="h-5 w-5 animate-spin" /> Loading…
         </div>
       )}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{labels.id}</TableHead>
+                <TableHead>{labels.name}</TableHead>
+                <TableHead>{labels.contact}</TableHead>
+                <TableHead>{labels.vehicle}</TableHead>
+                <TableHead>{labels.type}</TableHead>
+                <TableHead>{labels.kyc}</TableHead>
+                <TableHead>{labels.status}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {drivers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-gray-500">
+                    {labels.empty}
+                  </TableCell>
+                </TableRow>
+              )}
+              {drivers.map((d) => {
+                const truck = d.trucks?.[0];
+                const kyc =
+                  d.kyc_status ||
+                  (d.is_verified ? 'verified' : 'pending');
+                const needsReview = kyc === 'pending';
+                return (
+                  <TableRow
+                    key={d.driver_id}
+                    className={`cursor-pointer hover:bg-gray-50 ${
+                      needsReview
+                        ? 'bg-amber-50/60'
+                        : kyc === 'denied'
+                          ? 'bg-slate-50'
+                          : ''
+                    }`}
+                    onClick={() => void openDetail(d.driver_id)}
+                  >
+                    <TableCell className="font-mono text-sm text-gray-700">
+                      #{d.driver_id}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {d.user?.name || `Driver #${d.driver_id}`}
+                        {needsReview && (
+                          <Badge className="bg-amber-500 hover:bg-amber-500">
+                            {labels.needsReview}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        {d.user?.phone && (
+                          <div className="flex items-center gap-1">
+                            <Phone className="h-3 w-3" />
+                            {d.user.phone}
+                          </div>
+                        )}
+                        {d.user?.email && (
+                          <div className="flex items-center gap-1">
+                            <Mail className="h-3 w-3" />
+                            {d.user.email}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {truck
+                        ? `${truck.truck_type || truck.vehicle_size || 'Vehicle'} · ${truck.license_plate || '—'}`
+                        : '—'}
+                    </TableCell>
+                    <TableCell>{d.driver_type || '—'}</TableCell>
+                    <TableCell>
+                      {kyc === 'verified' ? (
+                        <Badge className="bg-green-600 hover:bg-green-600">
+                          <ShieldCheck className="h-3 w-3 mr-1" />
+                          {labels.verified}
+                        </Badge>
+                      ) : kyc === 'denied' ? (
+                        <Badge className="bg-slate-800 hover:bg-slate-800">
+                          <ShieldX className="h-3 w-3 mr-1" />
+                          {labels.denied}
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive">
+                          <ShieldAlert className="h-3 w-3 mr-1" />
+                          {labels.unverified}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{d.status || 'unknown'}</Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      <Dialog
+        open={selectedId != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedId(null);
+            setDetail(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{labels.details}</DialogTitle>
+            <DialogDescription>
+              {detail?.user?.name ||
+                (selectedId ? `Driver #${selectedId}` : '')}
+              {selectedId != null ? (
+                <span className="ms-2 font-mono text-xs text-gray-500">
+                  ID #{selectedId}
+                </span>
+              ) : null}
+              {detail &&
+              (detail.kyc_status ||
+                (detail.is_verified ? 'verified' : 'pending')) === 'pending' ? (
+                <Badge className="ml-2 bg-amber-500 hover:bg-amber-500 align-middle">
+                  {labels.needsReview}
+                </Badge>
+              ) : detail?.kyc_status === 'denied' ? (
+                <Badge className="ml-2 bg-slate-800 hover:bg-slate-800 align-middle">
+                  {labels.denied}
+                </Badge>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+
+          {detailLoading || !detail ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+            </div>
+          ) : (
+            <div className="space-y-5">
+              <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-gray-500">Email</span>
+                  <p className="font-medium">{detail.user?.email || '—'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Phone</span>
+                  <p className="font-medium">{detail.user?.phone || '—'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Status</span>
+                  <p className="font-medium">{detail.status || '—'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Type</span>
+                  <p className="font-medium">{detail.driver_type || '—'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Joined</span>
+                  <p className="font-medium">
+                    {detail.user?.created_at
+                      ? new Date(detail.user.created_at).toLocaleString()
+                      : '—'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Business</span>
+                  <p className="font-medium">
+                    {detail.business?.company_name || '—'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">{labels.docs}</h4>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <DocLink label="ID card" url={detail.id_card_upload} />
+                  <DocLink
+                    label="Driving licence"
+                    url={detail.drivers_license_upload}
+                  />
+                  <DocLink
+                    label="Vehicle registration"
+                    url={
+                      detail.vehicle_registration_upload ||
+                      detail.trucks?.[0]?.vehicle_registration_upload
+                    }
+                  />
+                  <DocLink
+                    label="Insurance card"
+                    url={
+                      detail.insurance_card_upload ||
+                      detail.trucks?.[0]?.insurance_card_upload
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="license">{labels.license}</Label>
+                  <Input
+                    id="license"
+                    value={licenseNumber}
+                    onChange={(e) => setLicenseNumber(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="plate">{labels.plate}</Label>
+                  <Input
+                    id="plate"
+                    value={plate}
+                    onChange={(e) => setPlate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="insCo">{labels.insuranceCo}</Label>
+                  <Input
+                    id="insCo"
+                    value={insuranceCompany}
+                    onChange={(e) => setInsuranceCompany(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="insId">{labels.insuranceId}</Label>
+                  <Input
+                    id="insId"
+                    value={insuranceId}
+                    onChange={(e) => setInsuranceId(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="insExp">{labels.insuranceExp}</Label>
+                  <Input
+                    id="insExp"
+                    type="date"
+                    value={insuranceExpiry}
+                    onChange={(e) => setInsuranceExpiry(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="denyReason">{labels.denyReason}</Label>
+                  <Input
+                    id="denyReason"
+                    value={denyReason}
+                    onChange={(e) => setDenyReason(e.target.value)}
+                    placeholder="Optional"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={acting}
+                  onClick={() => void submitKyc('deny')}
+                >
+                  {acting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  {labels.deny}
+                </Button>
+                <Button
+                  type="button"
+                  disabled={acting}
+                  onClick={() => void submitKyc('approve')}
+                >
+                  {acting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  {labels.approve}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
