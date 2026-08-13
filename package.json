@@ -7,13 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve dist -s -l tcp://0.0.0.0:${PORT:-8000}"
   },
   "dependencies": {
     "lucide-react": "^1.31.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
+    "serve": "^14.2.6",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
