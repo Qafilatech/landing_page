@@ -1,63 +1,123 @@
 # QafilaTech Landing Page
 
-Marketing site for [QafilaTech](https://qafila.tech) — a logistics marketplace connecting customers, drivers, and businesses.
+Static marketing site for [QafilaTech](https://qafila.tech) — a logistics marketplace connecting customers, drivers, and businesses.
+
+This repo is **frontend only**. There is no backend, auth, or database in this project. Registration happens via external Microsoft Forms links.
 
 ## Features
 
-- Responsive layout (mobile, tablet, desktop)
+- Fully responsive layout (mobile, tablet, desktop)
 - English / Arabic language toggle with RTL support
-- Customer / Driver audience switch on the landing page
-- Hero video, features, how-it-works, and CTA sections
-- External registration forms (Microsoft Forms) for sign-ups
+- Customer / Driver audience switch (synced between navbar and features)
+- Landing sections: hero video, trust bar, features, how it works, CTA, footer
+- Smooth scroll navigation and scroll-triggered animations
+- 404 page for unknown routes
 
 ## Tech Stack
 
-- **React 18** + **TypeScript**
-- **Vite** — dev server and production build
-- **Tailwind CSS** — styling and animations
-- **React Router** — client-side routing (`/` and 404)
-- **Lucide React** — icons
+| Layer | Tools |
+|-------|-------|
+| UI | React 18, TypeScript |
+| Build | Vite |
+| Styling | Tailwind CSS, tailwindcss-animate |
+| Routing | React Router |
+| Icons | Lucide React |
+| Fonts | Plus Jakarta Sans, Tajawal (Google Fonts) |
+
+## Prerequisites
+
+- Node.js 18+
+- npm
 
 ## Getting Started
 
 ```bash
+# Install dependencies
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # output → dist/
-npm run preview  # preview production build locally
+
+# Start dev server → http://localhost:3000
+npm run dev
+
+# Production build → dist/
+npm run build
+
+# Preview production build locally
+npm run preview
+
+# Lint
+npm run lint
 ```
 
 ## Project Structure
 
 ```
-src/
-├── components/       # Landing page sections
-│   ├── Navbar.tsx
-│   ├── Hero.tsx
-│   ├── TrustBar.tsx
-│   ├── Features.tsx
-│   ├── HowItWorks.tsx
-│   ├── CTA.tsx
-│   └── Footer.tsx
-├── pages/
-│   ├── Index.tsx     # Landing page
-│   └── NotFound.tsx  # 404 page
-├── context/
-│   └── LanguageContext.tsx
-├── App.tsx
-├── main.tsx
-└── index.css
-public/               # Static assets (logos, video, mockups)
+landing_page/
+├── public/                  # Static assets served as-is
+│   ├── QT-Logo/             # Light & dark logo variants
+│   ├── singleLogo.png       # Favicon & OG image
+│   ├── heroSplash3.png      # Hero poster / fallback image
+│   ├── Mockup.png           # Features section mockup
+│   └── 5171156-hd_*.mp4     # Hero background video
+├── src/
+│   ├── components/          # Landing page sections
+│   │   ├── Navbar.tsx
+│   │   ├── Hero.tsx
+│   │   ├── TrustBar.tsx
+│   │   ├── Features.tsx
+│   │   ├── HowItWorks.tsx
+│   │   ├── CTA.tsx
+│   │   └── Footer.tsx
+│   ├── pages/
+│   │   ├── Index.tsx        # Main landing page
+│   │   └── NotFound.tsx     # 404 page
+│   ├── context/
+│   │   └── LanguageContext.tsx
+│   ├── App.tsx              # Routes: / and *
+│   ├── main.tsx             # App entry point
+│   └── index.css            # Global styles & design tokens
+├── index.html
+├── vite.config.ts
+├── tailwind.config.ts
+└── package.json
 ```
+
+## Routes
+
+| Path | Page |
+|------|------|
+| `/` | Landing page |
+| `*` | 404 — Not Found |
+
+## Registration Links
+
+Sign-up CTAs point to Microsoft Forms (configured in `src/components/CTA.tsx`):
+
+- **Customer registration** — Office Forms design page
+- **Driver registration** — Office Forms response page
 
 ## Deployment
 
-Build the static site with `npm run build` and deploy the `dist/` folder to any static host (Koyeb, Netlify, Vercel, etc.).
+1. Run `npm run build`
+2. Deploy the generated `dist/` folder to any static host
 
-Production domains configured in `vite.config.ts`:
+Configured production hosts in `vite.config.ts`:
+
 - `qafila.tech`
 - `www.qafila.tech`
 - `robust-bandicoot-qafila-c8800ffd.koyeb.app`
+
+### Koyeb / static hosting
+
+```bash
+npm run build
+# Upload or sync the dist/ directory to your host
+```
+
+No environment variables are required for the landing page itself.
+
+## Brand
+
+Primary brand color: **teal `#507080`** — defined as CSS variables in `src/index.css`.
 
 ---
 
