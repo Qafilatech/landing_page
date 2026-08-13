@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Shield} from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { setAdminStatus } from '@/utils/adminUtils';
-import { signIn, signUp } from 'supertokens-auth-react/recipe/emailpassword';
 
 
 
@@ -125,16 +124,15 @@ const Auth = () => {
 
   return (
     <div className={`min-h-screen flex flex-col md:flex-row ${language === 'ar' ? 'rtl' : 'ltr'}`}>
-
       {/* Left section - Form */}
       <div className="flex flex-col justify-center w-full md:w-1/2 px-6 py-12 lg:px-8">
-      <Link to="/" className={`absolute top-8 ${language === 'ar' ? 'right-8' : 'left-8'} flex items-center text-primary hover:text-primary/80 transition-colors`}>
+        <Link to="/" className={`absolute top-8 ${language === 'ar' ? 'right-8' : 'left-8'} flex items-center text-primary hover:text-primary/80 transition-colors`}>
           <ArrowLeft className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4 ${language === 'ar' ? 'transform rotate-180' : ''}`} />
           {texts[language].backToHome}
         </Link>
 
         <button
-          onClick={toggleLanguage}
+          onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
           className={`absolute top-8 ${language === 'ar' ? 'left-8' : 'right-8'} p-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-white/80 text-primary`}
         >
           {authTexts[language].changeLanguage}
@@ -180,17 +178,33 @@ const Auth = () => {
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
-                  autoComplete="email"
-                  required
+                  placeholder={authTexts[language].emailAddress}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full rounded-md border-0 py-2 ${language === 'ar' ? 'pr-10 pl-3 text-right' : 'pl-10 pr-3 text-left'} text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                  placeholder={language === 'en' ? "name@example.com" : "الاسم@مثال.كوم"}
-                  dir={language === 'ar' ? 'rtl' : 'ltr'}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full mb-4 p-2 border rounded"
+                  required
                 />
+                <input
+                  type="password"
+                  placeholder={authTexts[language].password}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full mb-4 p-2 border rounded"
+                  required
+                />
+                <button type="submit" className="w-full bg-primary text-white py-2 rounded">
+                  {authTexts[language].signInButton}
+                </button>
+              </form>
+              <div className="mt-6 text-center text-sm text-gray-500">
+                {authTexts[language].dontHaveAccount}{' '}
+                <button
+                  onClick={() => setShowSignIn(false)}
+                  className="font-semibold text-primary hover:text-primary/80"
+                >
+                  {authTexts[language].createOne}
+                </button>
               </div>
             </div>
 
@@ -232,22 +246,34 @@ const Auth = () => {
                   type={showPassword ? "text" : "password"}
                     autoComplete="current-password" // Now always current-password
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full rounded-md border-0 py-2 ${language === 'ar' ? 'pr-10 pl-10 text-right' : 'pl-10 pr-10 text-left'} text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6`}
-                  placeholder="••••••••"
-                  dir={language === 'ar' ? 'rtl' : 'ltr'}
                 />
+                <input
+                  type="password"
+                  placeholder={authTexts[language].password}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full mb-4 p-2 border rounded"
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder={authTexts[language].confirmPassword}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  className="w-full mb-4 p-2 border rounded"
+                  required
+                />
+                <button type="submit" className="w-full bg-primary text-white py-2 rounded">
+                  {authTexts[language].signUpButton}
+                </button>
+              </form>
+              <div className="mt-6 text-center text-sm text-gray-500">
+                {authTexts[language].alreadyHaveAccount}{' '}
                 <button
-                  type="button"
-                  className={`absolute inset-y-0 ${language === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
-                  onClick={togglePasswordVisibility}
+                  onClick={() => setShowSignIn(true)}
+                  className="font-semibold text-primary hover:text-primary/80"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
+                  {authTexts[language].switchToSignIn}
                 </button>
               </div>
             </div>
@@ -273,12 +299,11 @@ const Auth = () => {
           <div className="h-full w-full bg-gradient-to-b from-black/60 to-black/20 flex items-center justify-center">
             <div className="text-center px-8 py-12 max-w-md">
               <h2 className="text-3xl font-bold text-white mb-4">
-              {language === 'en' ? 'Join Our Platform' : 'انضم إلى منصتنا'}
+                {authTexts[language].joinPlatform}
               </h2>
               <p className="text-white/90">
-              {language === 'en'
-                  ? 'Connect with customers and truckers in one place. Streamline your logistics and transportation needs with our comprehensive platform.'
-                  : 'تواصل مع العملاء وسائقي الشاحنات في مكان واحد. قم بتبسيط احتياجاتك اللوجستية والنقل مع منصتنا الشاملة.'}              </p>
+                {authTexts[language].platformDescription}
+              </p>
             </div>
           </div>
         </div>

@@ -12,8 +12,6 @@ import { getWebsiteDomain, SuperTokensConfig } from "../src/Authentication/backe
 // Initialize SuperTokens
 supertokens.init(SuperTokensConfig)
 
-// Create Express app
-const app = express();
 
 //Middleware
 app.use(
@@ -53,9 +51,11 @@ app.get("/", (_, res) => {
     res.send("Welcome to QT, ya Cutei");
 });
 
-app.get("/api/test", (req, res) => {
-    res.json({ message: "Backend Live" });
+app.get("/", (_, res) => {  
+  res.send("Welcome to QT API");
 });
+
+
 
 app.get("/api/admin", verifySession(), async (req: any, res: any) => {
     // if (req.session) {
@@ -79,10 +79,8 @@ app.get("/api/admin", verifySession(), async (req: any, res: any) => {
 app.use('/api', orderRouter);
 app.use('/api', userRouter);
 
-// Start server
-const PORT= process.env.PORTS || 8080;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+
+    );
 });
 
 export { app };
