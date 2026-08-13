@@ -1,19 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # System files
 .DS_Store
+**/.DS_Store
 
-# Ignore everything by default
-*
+# Lock files (project uses npm)
+bun.lockb
 
-# Allowlist specific files and folders
-!package.json
-!package-lock.json
-!yarn.lock
-!tsconfig.json
-!public/
-!src/
-!src/** 
-!README.md
-!LICENSE
-!.gitignore
-!*.ts          # Include all top-level TypeScript files
-!*.tsx
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+
+# Vite
+*.local
+
+# TypeScript
+*.tsbuildinfo

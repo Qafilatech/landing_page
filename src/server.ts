@@ -2,7 +2,6 @@
 import express from 'express';
 import cors from 'cors';
 import { middleware, errorHandler, SessionRequest } from "supertokens-node/framework/express";
-// import { errorHandler } from './Middleware/errorHandler';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import orderRouter from './routes/orders';
 import userRouter from './routes/users';
