@@ -1,6 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Tajawal:wght@300;400;500;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,65 +6,73 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 200 25% 98%;
+    --foreground: 200 28% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 200 28% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 200 28% 12%;
 
-    --primary: 183 30% 40%; 
-    --primary-foreground: 210 40% 98%;
+    --primary: 200 23% 41%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 200 24% 30%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 200 16% 94%;
+    --muted-foreground: 200 12% 38%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 200 20% 92%;
+    --accent-foreground: 200 28% 12%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 200 14% 86%;
+    --input: 200 14% 86%;
+    --ring: 200 23% 41%;
 
     --radius: 0.75rem;
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 200 28% 8%;
+    --foreground: 200 20% 96%;
 
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --card: 200 24% 11%;
+    --card-foreground: 200 20% 96%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 200 24% 11%;
+    --popover-foreground: 200 20% 96%;
 
-    --primary: 183 38% 34%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 200 23% 52%;
+    --primary-foreground: 200 28% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 200 18% 22%;
+    --secondary-foreground: 200 20% 96%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 200 18% 16%;
+    --muted-foreground: 200 12% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 200 18% 16%;
+    --accent-foreground: 200 20% 96%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 200 16% 20%;
+    --input: 200 16% 20%;
+    --ring: 200 23% 52%;
   }
 }
 
@@ -75,52 +81,60 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground antialiased;
     overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   ::selection {
-    @apply bg-primary/20;
+    @apply bg-primary/20 text-foreground;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
-  
-/* RTL support */
+
 .rtl {
   direction: rtl;
-  font-family: 'Tajawal', 'Roboto', sans-serif;
+  font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
 }
 
 .ltr {
   direction: ltr;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 @layer components {
   .btn-main {
-    @apply px-8 py-3 bg-primary text-white rounded-full font-medium tracking-wide shadow-lg 
-    transition-all duration-300 hover:shadow-xl hover:brightness-110 
-    focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 active:scale-[0.98];
+    @apply inline-flex items-center justify-center min-h-11 px-7 py-3
+      bg-primary text-primary-foreground rounded-xl font-semibold
+      shadow-[0_8px_24px_rgba(80,112,128,0.22)]
+      transition-all duration-200 ease-out cursor-pointer
+      hover:bg-secondary hover:shadow-[0_10px_28px_rgba(80,112,128,0.28)]
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+      active:translate-y-px;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center min-h-11 px-7 py-3
+      rounded-xl font-semibold border border-white/25 text-white
+      transition-all duration-200 ease-out cursor-pointer
+      hover:bg-white/10
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2;
   }
 
   .nav-link {
-    @apply relative text-foreground/80 hover:text-foreground transition-colors duration-300 
-    after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-primary 
-    after:transition-all after:duration-300 hover:after:w-full;
-  }
-
-  .nav-link.active {
-    @apply text-foreground after:w-full;
-  }
-
-  .nav-btn {
-    @apply inline-flex items-center justify-center rounded-full text-sm font-medium 
-    transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
-    disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  .btn-demo-small {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 mx-1 rounded-full shadow-sm;
+    @apply relative text-sm font-medium cursor-pointer
+      transition-colors duration-200
+      after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-200
+      hover:after:w-full;
   }
 
   .section-padding {
@@ -128,66 +142,41 @@
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl font-bold mb-4 tracking-tight;
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-foreground;
   }
 
   .section-description {
-    @apply text-muted-foreground text-lg max-w-3xl mx-auto mb-12;
+    @apply text-muted-foreground text-lg max-w-3xl mx-auto;
   }
 
-  .blur-card {
-    @apply bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20;
+  .icon-well {
+    @apply flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary;
   }
 
-  .icon-box {
-    @apply flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 
-    text-primary mb-4 transition-transform duration-500 ease-in-out group-hover:scale-110;
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60]
+      focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg;
   }
 
-  /* Custom animation classes */
   .animate-on-scroll {
-    @apply opacity-0 translate-y-8 transition-all duration-700;
+    @apply opacity-0 translate-y-6 transition-all duration-500 ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 
-  .animate-on-scroll.active {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-on-scroll {
     @apply opacity-100 translate-y-0;
-  }
-}
-
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Navbar styles */
-.custom-navbar {
-  @apply bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300;
-}
-
-.custom-navbar.scrolled {
-  @apply shadow-md bg-white/90;
-}
-
-/* Carousel custom styling */
-.carousel-container {
-  @apply relative overflow-hidden rounded-2xl;
-}
-
-.carousel-slide {
-  @apply opacity-0 absolute inset-0 transition-opacity duration-1000 ease-in-out;
-}
-
-.carousel-slide.active {
-  @apply opacity-100 z-10;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .section-title {
-    @apply text-2xl;
-  }
-  
-  .section-padding {
-    @apply py-12;
   }
 }

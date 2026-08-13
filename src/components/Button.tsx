@@ -1,15 +1,3 @@
-/**
- * Button Component
- * 
- * A reusable button component that supports multiple variants and styles.
- * Features hover effects, focus states, and active animations.
- * 
- * @param {Object} props
- * @param {string} [props.variant='main'] - Button style variant ('main', 'secondary', or 'outline')
- * @param {string} [props.className] - Additional CSS classes
- * @param {ReactNode} props.children - Button content
- */
-
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -19,29 +7,23 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'main', children, ...props }, ref) => {
-    // Base styles applied to all button variants
-    const baseStyles = 'inline-flex items-center justify-center rounded-full font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 active:scale-[0.98]';
-    
-    // Specific styles for each button variant
+    const baseStyles =
+      'inline-flex items-center justify-center min-h-11 rounded-xl font-semibold cursor-pointer transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-px disabled:pointer-events-none disabled:opacity-50';
+
     const variantStyles = {
-      main: 'bg-primary text-white px-6 py-3 shadow-lg hover:shadow-xl hover:brightness-110',
-      secondary: 'bg-white/90 border border-gray-200 text-gray-800 px-6 py-3 shadow-sm hover:shadow hover:bg-white',
-      outline: 'border border-primary/20 text-primary hover:bg-primary/5 px-6 py-3',
+      main: 'bg-primary text-primary-foreground px-6 py-3 shadow-[0_8px_24px_rgba(80,112,128,0.22)] hover:bg-secondary',
+      secondary: 'bg-card border border-border text-foreground px-6 py-3 hover:bg-muted',
+      outline: 'border border-primary/30 text-primary hover:bg-primary/10 px-6 py-3',
     };
-    
+
     return (
-      <button
-        className={cn(baseStyles, variantStyles[variant], className)}
-        ref={ref}
-        {...props}
-      >
+      <button className={cn(baseStyles, variantStyles[variant], className)} ref={ref} {...props}>
         {children}
       </button>
     );
   }
 );
 
-// Display name for React DevTools
 Button.displayName = 'Button';
 
 export default Button;
