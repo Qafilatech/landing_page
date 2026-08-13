@@ -19,7 +19,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Roboto', 'sans-serif'],
+				sans: ['Plus Jakarta Sans', 'Tajawal', 'sans-serif'],
+				heading: ['Plus Jakarta Sans', 'Tajawal', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

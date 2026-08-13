@@ -1,34 +1,31 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import Navbar, { type Audience } from '@/components/Navbar';
 import Hero from '@/components/Hero';
+import TrustBar from '@/components/TrustBar';
 import Features from '@/components/Features';
 import HowItWorks from '@/components/HowItWorks';
 import CTA from '@/components/CTA';
 import Footer from '@/components/Footer';
 
 const Index = () => {
-  const [activeButton, setActiveButton] = useState('customer'); // 'customer' or 'trucker'
+  const [activeButton, setActiveButton] = useState<Audience>('customer');
 
   useEffect(() => {
-    // Set up smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href');
-        if (!targetId) return;
-        
-        const targetElement = document.querySelector(targetId);
-        if (!targetElement) return;
-        
-        window.scrollTo({
-          top: targetElement.offsetTop - 80, // Offset for the fixed navbar
-          behavior: 'smooth'
-        });
-      });
-    });
+    const onClick = (event: Event) => {
+      const anchor = event.currentTarget as HTMLAnchorElement;
+      const targetId = anchor.getAttribute('href');
+      if (!targetId || targetId === '#') return;
+      const targetElement = document.querySelector(targetId);
+      if (!targetElement) return;
+      event.preventDefault();
+      const top = targetElement.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    };
 
-    // Set up intersection observer for animations
+    const anchors = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    anchors.forEach((anchor) => anchor.addEventListener('click', onClick));
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -37,27 +34,29 @@ const Index = () => {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.12 }
     );
 
-    const animatedElements = document.querySelectorAll('.animate-on-scroll');
-    animatedElements.forEach(el => observer.observe(el));
+    if (!motionQuery.matches) {
+      document.querySelectorAll('.animate-on-scroll').forEach((el) => observer.observe(el));
+    }
 
     return () => {
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.removeEventListener('click', () => {});
-      });
-      
-      animatedElements.forEach(el => observer.unobserve(el));
+      anchors.forEach((anchor) => anchor.removeEventListener('click', onClick));
+      observer.disconnect();
     };
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <Navbar activeButton={activeButton} setActiveButton={setActiveButton} />
-      <main>
+      <main id="main">
         <Hero />
-        <Features activeButton={activeButton} />
+        <TrustBar />
+        <Features activeButton={activeButton} setActiveButton={setActiveButton} />
         <HowItWorks />
         <CTA />
       </main>

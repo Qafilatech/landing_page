@@ -1,139 +1,83 @@
-/**
- * Hero Component
- * 
- * The main landing section of the application featuring a video background,
- * multilingual content, and animated visual elements.
- * Includes responsive design and scroll-triggered animations.
- */
-
-import { useEffect, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { ArrowRight } from 'lucide-react';
 
 const Hero = () => {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const {language} = useLanguage();
-  
-  // Initialize intersection observer for fade-in animation
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('opacity-100');
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.1,
-      }
-    );
+  const { language } = useLanguage();
 
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => {
-      if (heroRef.current) {
-        observer.unobserve(heroRef.current);
-      }
-    };
-  }, []);
-
-  // Multilingual content configuration
   const heroTexts = {
     en: {
       tagline: 'Streamline Your Logistics with Ease',
-      title: 'Connecting Customers, Truck Drivers, ',
+      title: 'Connecting Customers, Truck Drivers,',
       titleHighlight: 'and Businesses.',
-      description: 'Efficiently manage deliveries and logistics with our comprehensive marketplace. Join today to streamline your operations and enhance your business growth.',
+      description:
+        'Efficiently manage deliveries and logistics with our comprehensive marketplace. Join today to streamline your operations and enhance your business growth.',
       downloadButton: 'Register Now',
-      learnMoreButton: 'Learn More'
+      learnMoreButton: 'Learn More',
     },
     ar: {
       tagline: 'بسّط عمليات الخدمات اللوجستية بسهولة',
-      title: 'ربط العملاء وسائقي الشاحنات ',
+      title: 'ربط العملاء وسائقي الشاحنات',
       titleHighlight: 'والشركات.',
-      description: 'إدارة عمليات التسليم والخدمات اللوجستية بكفاءة مع منصتنا الشاملة. انضم اليوم لتبسيط عملياتك وتعزيز نمو أعمالك.',
+      description:
+        'إدارة عمليات التسليم والخدمات اللوجستية بكفاءة مع منصتنا الشاملة. انضم اليوم لتبسيط عملياتك وتعزيز نمو أعمالك.',
       downloadButton: 'سجل الآن',
-      learnMoreButton: 'اعرف المزيد'
-    }
+      learnMoreButton: 'اعرف المزيد',
+    },
   };
 
+  const copy = heroTexts[language];
+
   return (
-    <section 
-      id="hero" 
-      className="pt-24 lg:pt-32 pb-16 lg:pb-24 relative overflow-hidden"
-      ref={heroRef}
-    >
-      {/* Video Background with Overlay */}
-      <div className="absolute inset-0 w-full h-full">
-        <video autoPlay loop muted
-          src="\5171156-hd_1920_1080_30fps.mp4"
-          className="w-full h-full object-cover"
+    <section id="hero" className="relative min-h-[92vh] overflow-hidden pt-28 lg:pt-32 pb-24 lg:pb-32 bg-[hsl(200,28%,10%)]">
+      <div className="absolute inset-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/heroSplash3.png"
+          src="/5171156-hd_1920_1080_30fps.mp4"
+          className="h-full w-full object-cover"
+          aria-hidden="true"
         />
-        {/* Dark gradient overlay for better text visibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/45 via-transparent to-black/50" />
       </div>
 
-      {/* Additional visual effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-60 mix-blend-overlay" />
-      <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iLjEiPjxwYXRoIGQ9Ik0zNiAxOGMxLjIgMCAyLjItLjQgMy0xLjIuOC0uOCAxLjItMS44IDEuMi0zcy0uNC0yLjItMS4yLTNjLS44LS44LTEuOC0xLjItMy0xLjJzLTIuMi40LTMgMS4yYy0uOC44LTEuMiAxLjgtMS4yIDNzLjQgMi4yIDEuMiAzYy44LjggMS44IDEuMiAzIDEuMnptMCAyNGMxLjIgMCAyLjItLjQgMy0xLjIuOC0uOCAxLjItMS44IDEuMi0zcy0uNC0yLjItMS4yLTNjLS44LS44LTEuOC0xLjItMy0xLjJzLTIuMi40LTMgMS4yYy0uOC44LTEuMiAxLjgtMS4yIDNzLjQgMi4yIDEuMiAzYy44LjggMS44IDEuMiAzIDEuMnptMTItMTJjMS4yIDAgMi4yLS40IDMtMS4yLjgtLjggMS4yLTEuOCAxLjItM3MtLjQtMi4yLTEuMi0zYy0uOC0uOC0xLjgtMS4yLTMtMS4ycy0yLjIuNC0zIDEuMmMtLjguOC0xLjIgMS44LTEuMiAzcy40IDIuMiAxLjIgM2MuOC44IDEuOCAxLjIgMyAxLjJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] mix-blend-overlay" />
-      
-      {/* Main content container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Image Column - Mobile order changed for better UX */}
-          <div className="lg:col-span-5 order-2 lg:order-1 flex justify-center">
-            <div className="relative">
-              {/* Main image with animation */}
-              <div 
-                className="relative z-10 animate-float rounded-2xl overflow-hidden shadow-2xl mr-10 before:absolute before:inset-0 before:-z-10 before:bg-primary/30 before:blur-3xl before:transform before:scale-[2]"
-                style={{ 
-                  boxShadow: `
-                    0 0 80px 20px var(--primary-color-rgb-values),
-                    0 0 160px 40px var(--primary-color-rgb-values),
-                    0 0 200px 60px rgba(var(--primary-color-rgb-values), 0.8),
-                    inset 0 0 60px 15px var(--primary-color-rgb-values)
-                  `
-                }}
-              >
-                <img 
-                  src="/heroSplash3.png" 
-                  alt="Mobile App Showcase" 
-                  className="w-full h-auto object-cover rounded-2xl hover:animate-image-zoom relative z-10"
-                />
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <div className="max-w-2xl">
+              <p className="mb-5 inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-medium text-white/90 backdrop-blur-sm">
+                {copy.tagline}
+              </p>
+              <h1 className="mb-6 text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                {copy.title}{' '}
+                <span className="text-[#9ec4c8]">{copy.titleHighlight}</span>
+              </h1>
+              <p className="mb-8 max-w-xl text-lg leading-relaxed text-white/80">{copy.description}</p>
+              <div className="flex flex-wrap gap-3">
+                <a href="#cta" className="btn-main">
+                  {copy.downloadButton}
+                  <ArrowRight className={`h-4 w-4 ${language === 'ar' ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </a>
+                <a href="#howitworks" className="btn-ghost">
+                  {copy.learnMoreButton}
+                </a>
               </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-xl -z-10"></div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/10 rounded-full blur-xl -z-10"></div>
             </div>
           </div>
-          
-          {/* Content Column */}
-          <div className="lg:col-span-7 order-1 lg:order-2 animate-fade-up opacity-100 transition-opacity duration-500">
-            <div className="max-w-2xl">
-              <div className="inline-block mb-2">
-                <span className="px-3 py-1 rounded-full text-s font-medium bg-primary/30 text-primary">
-                  | {heroTexts[language].tagline}
-                </span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-white">
-                {heroTexts[language].title} <span className="text-primary">{heroTexts[language].titleHighlight}</span>
-              </h1>
-              
-              <p className="text-lg text-gray-200 mb-8 leading-relaxed">
-                {heroTexts[language].description}
-              </p>
-              
-              <div className="flex flex-wrap gap-4">
-                <a href="#cta" className="btn-main">
-                  {heroTexts[language].downloadButton}
-                </a>
-                <a href="#howitworks" className="px-8 py-3 border border-white/20 text-white rounded-full font-medium hover:bg-white/5 transition-colors">
-                  {heroTexts[language].learnMoreButton}
-                </a>
-              </div>
+
+          <div className="flex justify-center lg:col-span-5">
+            <div className="relative max-w-sm">
+              <div className="absolute -inset-8 rounded-[2rem] bg-primary/30 blur-3xl" aria-hidden="true" />
+              <img
+                src="/heroSplash3.png"
+                alt={language === 'ar' ? 'واجهة تطبيق كفيلة تك' : 'QafilaTech mobile app'}
+                width={640}
+                height={800}
+                className="relative z-10 w-full rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(22,34,40,0.45)]"
+              />
             </div>
           </div>
         </div>

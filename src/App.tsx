@@ -7,33 +7,47 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { LanguageProvider } from "./context/LanguageContext";
 import Admin from "./pages/Admin";
-import initializeAuth from "./pages/Auth";
-import { frontendConfig } from '../src/Authentication/frontendConfig'
-import supertokens from 'supertokens-node';
-import SuperTokens from 'supertokens-auth-react';
+import ActivateAccount from "./pages/ActivateAccount";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard"; // Import SuperAdminDashboard
+import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
+import {SuperTokensConfig, ComponentWrapper } from "../src/Authentication/frontendConfig";
+import { SessionAuth } from "supertokens-auth-react/recipe/session";
 
-SuperTokens.init(frontendConfig());
-console.log('SuperTokens frontend initialized successfully');
 
+// Initialize SuperTokens - ideally in the global
+SuperTokens.init(SuperTokensConfig);
 
 const queryClient = new QueryClient();
 
 const App = () => (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <LanguageProvider>
-          <DefaultToaster />
-          <BrowserRouter>
+  <SuperTokensWrapper>
+    <ComponentWrapper>
+      <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LanguageProvider>
+            <DefaultToaster/>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/admin" element={<Admin/>} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<Index/>}/>
+              <Route path="/auth" element={<Auth/>}/>
+              <Route 
+              path="/admin" 
+              element={
+              <SessionAuth>
+                <Admin/>
+                </SessionAuth>} />
+              <Route path="/:tenantId/activate-account" element={<ActivateAccount />} />
+              <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+              <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} /> {/* Super Admin Dashboard Route */}
+              <Route path="*" element={<NotFound/>}/>
             </Routes>
-          </BrowserRouter>
-        </LanguageProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+          </LanguageProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+      </BrowserRouter>
+    </ComponentWrapper>
+  </SuperTokensWrapper>
 );
 
 export default App;
